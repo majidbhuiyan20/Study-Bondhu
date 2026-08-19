@@ -1,0 +1,66 @@
+name: study_bondhu
+description: "StudyBondhu - Offline-first academic companion for Bangladeshi students."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Routing
+  go_router: ^14.2.7
+
+  # Database
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  path_provider: ^2.1.4
+
+  # Localization
+  intl: ^0.20.2
+
+  # Utilities
+  uuid: ^4.5.1
+  equatable: ^2.0.5
+
+  # Notifications
+  flutter_local_notifications: ^17.2.3
+
+  # Charts (for analytics)
+  fl_chart: ^0.69.0
+
+  # Shared preferences (settings)
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/fonts/
+    - lib/l10n/app_en.arb
+    - lib/l10n/app_bn.arb
+
+  fonts:
+    - family: TriooBangla
+      fonts:
+        - asset: assets/fonts/TiroBangla-Regular.ttf
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/TiroBangla-Regular.ttf
+      # Fallback chain: if you add more weights later, list them here.
+
