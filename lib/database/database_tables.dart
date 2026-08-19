@@ -166,6 +166,7 @@ class Columns {
   static const String expenseCategory = 'category';
   static const String expenseDate = 'date';
   static const String expenseNote = 'note';
+  static const String expenseType = 'type'; // 'expense' | 'income'
 
   // Goals
   static const String goalTitle = 'title';

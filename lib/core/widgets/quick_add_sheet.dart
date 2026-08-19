@@ -3,10 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/assignments/views/assignment_add_view.dart';
 import '../../features/exams/views/exam_add_view.dart';
-import '../../features/expenses/views/expenses_view.dart';
 import '../../features/notes/views/note_editor_view.dart';
 import '../../features/subjects/views/subject_add_view.dart';
-import '../../features/subjects/views/topic_add_sheet.dart';
 import '../constants/app_routes.dart';
 import '../l10n.dart' show AppLocalizationsX,AppLocalizationsCamelCase;
 import '../theme/theme_colors.dart';
@@ -51,7 +49,7 @@ class QuickAddSheet extends StatelessWidget {
       _QuickTile(
         icon: Icons.account_tree_rounded,
         label: l10n.quickAddTopic,
-        onTap: () => TopicAddSheet.show(context),
+        onTap: () => context.push(AppRoutes.topicAdd),
       ),
       _QuickTile(
         icon: Icons.sticky_note_2_outlined,
@@ -71,12 +69,17 @@ class QuickAddSheet extends StatelessWidget {
       _QuickTile(
         icon: Icons.style_outlined,
         label: l10n.quickAddFlashcard,
-        onTap: () => context.push(AppRoutes.flashcards),
+        onTap: () => context.push(AppRoutes.flashcardDeckAdd),
       ),
       _QuickTile(
         icon: Icons.attach_money_rounded,
         label: l10n.quickAddExpense,
-        onTap: () => _open(context, const ExpensesView()),
+        onTap: () => context.push(AppRoutes.expenseAdd),
+      ),
+      _QuickTile(
+        icon: Icons.payments_outlined,
+        label: l10n.quickAddIncome,
+        onTap: () => context.push(AppRoutes.incomeAdd),
       ),
     ];
 

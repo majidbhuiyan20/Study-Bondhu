@@ -6,7 +6,7 @@ class AppConstants {
 
   // Database
   static const String dbName = 'study_bondhu.db';
-  static const int dbVersion = 6;
+  static const int dbVersion = 7;
 
   // Keys
   static const String prefLocale = 'pref_locale';

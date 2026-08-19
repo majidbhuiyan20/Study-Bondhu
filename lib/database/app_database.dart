@@ -273,7 +273,7 @@ class AppDatabase {
       )
     ''');
 
-    // Expenses
+    // Expenses (single table for both expense + income — type column discriminates)
     batch.execute('''
       CREATE TABLE ${Tables.expenses} (
         ${Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -282,6 +282,7 @@ class AppDatabase {
         ${Columns.expenseCategory} TEXT NOT NULL DEFAULT 'other',
         ${Columns.expenseDate} INTEGER NOT NULL,
         ${Columns.expenseNote} TEXT,
+        ${Columns.expenseType} TEXT NOT NULL DEFAULT 'expense',
         ${Columns.createdAt} INTEGER NOT NULL
       )
     ''');
@@ -514,6 +515,16 @@ class AppDatabase {
         )
       ''');
       await batch.commit(noResult: true);
+    }
+    if (oldVersion < 7) {
+      // v6 → v7: add `type` to expenses so the same table tracks both
+      // expenses and income (allowance / part-time / etc). Defaults to
+      // 'expense' so all existing rows remain expenses.
+      try {
+        await db.execute(
+          'ALTER TABLE ${Tables.expenses} ADD COLUMN ${Columns.expenseType} TEXT NOT NULL DEFAULT \'expense\'',
+        );
+      } catch (_) {/* already migrated */}
     }
   }
 }

@@ -7,7 +7,10 @@ import '../features/attendance/views/attendance_view.dart';
 import '../features/exams/views/exam_add_view.dart';
 import '../features/exams/views/exam_preparation_view.dart';
 import '../features/exams/views/exams_view.dart';
+import '../features/expenses/views/expense_add_view.dart';
 import '../features/expenses/views/expenses_view.dart';
+import '../features/expenses/views/income_add_view.dart';
+import '../features/flashcards/views/flashcard_deck_add_view.dart';
 import '../features/flashcards/views/flashcards_view.dart';
 import '../features/home/views/main_shell.dart';
 import '../features/notes/views/notes_view.dart';
@@ -26,6 +29,7 @@ import '../features/subjects/views/semesters_view.dart';
 import '../features/subjects/views/semester_timeline_view.dart';
 import '../features/subjects/views/subject_add_view.dart';
 import '../features/subjects/views/subject_detail_view.dart';
+import '../features/subjects/views/topic_add_view.dart';
 import '../core/services/local_storage_service.dart';
 import 'constants/app_routes.dart';
 
@@ -92,6 +96,14 @@ GoRouter buildRouter() {
         builder: (context, state) => const SubjectAddView(),
       ),
       GoRoute(
+        path: AppRoutes.topicAdd,
+        builder: (context, state) {
+          final id = int.tryParse(
+              state.uri.queryParameters['subjectId'] ?? '');
+          return TopicAddView(initialSubjectId: id);
+        },
+      ),
+      GoRoute(
         path: AppRoutes.semesters,
         builder: (context, state) => const SemestersView(),
       ),
@@ -124,8 +136,20 @@ GoRouter buildRouter() {
         builder: (context, state) => const FlashcardsView(),
       ),
       GoRoute(
+        path: AppRoutes.flashcardDeckAdd,
+        builder: (context, state) => const FlashcardDeckAddView(),
+      ),
+      GoRoute(
         path: AppRoutes.expenses,
         builder: (context, state) => const ExpensesView(),
+      ),
+      GoRoute(
+        path: AppRoutes.expenseAdd,
+        builder: (context, state) => const ExpenseAddView(),
+      ),
+      GoRoute(
+        path: AppRoutes.incomeAdd,
+        builder: (context, state) => const IncomeAddView(),
       ),
       GoRoute(
         path: AppRoutes.profiles,

@@ -2294,6 +2294,12 @@ abstract class AppLocalizations {
   /// **'Quick add flashcard'**
   String get quick_add_flashcard;
 
+  /// No description provided for @quick_add_income.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add income'**
+  String get quick_add_income;
+
   /// No description provided for @quick_add_note.
   ///
   /// In en, this message translates to:

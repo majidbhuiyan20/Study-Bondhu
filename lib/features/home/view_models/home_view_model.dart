@@ -27,6 +27,7 @@ class HomeState {
   final List<Routine> todaysRoutines;
   final StudyRecommendation? recommendation;
   final Map<int, int> subjectSeconds;
+  final int weakTopicCount;
 
   const HomeState({
     this.isLoading = false,
@@ -39,6 +40,7 @@ class HomeState {
     this.todaysRoutines = const [],
     this.recommendation,
     this.subjectSeconds = const {},
+    this.weakTopicCount = 0,
   });
 
   double get dailyProgress {
@@ -57,6 +59,7 @@ class HomeState {
     List<Routine>? todaysRoutines,
     StudyRecommendation? recommendation,
     Map<int, int>? subjectSeconds,
+    int? weakTopicCount,
   }) =>
       HomeState(
         isLoading: isLoading ?? this.isLoading,
@@ -69,6 +72,7 @@ class HomeState {
         todaysRoutines: todaysRoutines ?? this.todaysRoutines,
         recommendation: recommendation ?? this.recommendation,
         subjectSeconds: subjectSeconds ?? this.subjectSeconds,
+        weakTopicCount: weakTopicCount ?? this.weakTopicCount,
       );
 }
 
@@ -185,6 +189,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
           _ref.read(routinesViewModelProvider).todaysRoutines,
       recommendation: recommendation,
       subjectSeconds: subjectSeconds,
+      weakTopicCount: weakTopics.length,
     );
   }
 

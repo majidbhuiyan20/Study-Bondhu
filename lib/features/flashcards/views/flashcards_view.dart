@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n.dart' show AppLocalizationsX,AppLocalizationsCamelCase;
+import '../../../core/constants/app_routes.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_empty_state.dart';
 import '../../../core/widgets/app_loading.dart';
-import '../../../core/widgets/quick_add_sheet.dart';
 import '../view_models/flashcards_view_model.dart';
 import 'flashcard_deck_view.dart';
 
@@ -35,7 +36,7 @@ class _FlashcardsViewState extends ConsumerState<FlashcardsView> {
       appBar: AppBar(title: Text(l10n.flashcards)),
       floatingActionButton: FloatingActionButton(
         heroTag: 'fab-flashcards',
-        onPressed: () => QuickAddSheet.show(context),
+        onPressed: () => context.push(AppRoutes.flashcardDeckAdd),
         child: const Icon(Icons.add),
       ),
       body: state.isLoading

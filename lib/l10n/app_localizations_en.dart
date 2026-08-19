@@ -1113,6 +1113,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quick_add_flashcard => 'Quick add flashcard';
 
   @override
+  String get quick_add_income => 'Quick add income';
+
+  @override
   String get quick_add_note => 'Quick add note';
 
   @override

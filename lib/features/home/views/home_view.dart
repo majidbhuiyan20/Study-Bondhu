@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../core/l10n.dart' show AppLocalizationsX,AppLocalizationsCamelCase;
+import '../../../core/constants/app_routes.dart';
+import '../../../core/l10n.dart'
+    show
+        AppLocalizationsBangla,
+        AppLocalizationsCamelCase,
+        AppLocalizationsX;
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_empty_state.dart';
 import '../../../core/widgets/quick_add_sheet.dart';
+import '../../assignments/view_models/assignments_view_model.dart';
 import '../../settings/view_models/settings_view_model.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/greeting_header.dart';
+import '../widgets/quick_stats_row.dart';
+import '../widgets/recent_activity_strip.dart';
 import '../widgets/routine_card.dart';
 import '../widgets/today_progress_card.dart';
 import '../widgets/today_tasks_section.dart';
@@ -39,6 +48,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final l10n = context.l10n;
     final state = ref.watch(homeViewModelProvider);
     final settings = ref.watch(settingsViewModelProvider);
+    final isBangla = l10n.isBangla;
+
+    // Quick stats: derive weak topic count by checking each subject.
+    final upcomingAssignments =
+        ref.watch(upcomingAssignmentsProvider).length;
+    final todayMinutes = state.todaySeconds ~/ 60;
+
+    final activity = _buildRecentActivity(
+      state: state,
+      isBangla: isBangla,
+      l10n: l10n,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -73,8 +94,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     : 'Bondhu',
               ),
               const SizedBox(height: 18),
-              TodayProgressCard(state: state),
+              QuickStatsRow(
+                minutesToday: todayMinutes,
+                assignmentsDue: upcomingAssignments,
+                weakTopicCount: state.weakTopicCount,
+                streakDays: state.streakDays,
+              ),
               const SizedBox(height: 18),
+              TodayProgressCard(state: state),
+              if (activity.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                RecentActivityStrip(items: activity),
+              ],
+              const SizedBox(height: 22),
               const StudyRecommendationCard(),
               const SizedBox(height: 22),
               RoutinesHomeSection(routines: state.todaysRoutines),
@@ -97,10 +129,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   state.todaysRoutines.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 28),
-                  child: AppEmptyState(
-                    title: l10n.studyNow,
-                    message: l10n.emptyStateCta,
-                    icon: Icons.auto_awesome,
+                  child: _FreshInstallEmptyState(
+                    onAddSubject: () =>
+                        context.push(AppRoutes.subjectAdd),
+                    onAddTask: () =>
+                        context.push(AppRoutes.assignmentAdd),
+                    onStartStudy: () =>
+                        context.push(AppRoutes.studyTimer),
                   ),
                 ),
               const SizedBox(height: 80),
@@ -110,6 +145,63 @@ class _HomeViewState extends ConsumerState<HomeView> {
       ),
     );
   }
+
+  /// Build a small list of "what just happened" entries pulled from
+  /// today's study sessions, today's due tasks, and pending revisions.
+  List<RecentActivity> _buildRecentActivity({
+    required HomeState state,
+    required bool isBangla,
+    required dynamic l10n,
+  }) {
+    final items = <RecentActivity>[];
+    // Study sessions from today
+    for (final s in state.subjectSeconds.entries) {
+      if (s.value <= 0) continue;
+      final subject = state.recommendation?.subject;
+      if (subject == null) continue;
+      if (subject.id != s.key) continue;
+      items.add(RecentActivity(
+        icon: Icons.timer_outlined,
+        title:
+            '${isBangla ? 'পড়াশোনা' : 'Studied'} ${subject.name}',
+        subtitle:
+            '${(s.value / 60).round()} ${isBangla ? 'মিনিট' : 'min'}',
+        timestamp: DateTime.now(),
+      ));
+      break;
+    }
+    // Today's assignments
+    if (state.todayAssignments.isNotEmpty) {
+      final first = state.todayAssignments.first;
+      items.add(RecentActivity(
+        icon: Icons.task_alt_rounded,
+        title: first.title,
+        subtitle:
+            isBangla ? 'আজকের কাজ' : 'Due today',
+        timestamp: first.dueDate ?? DateTime.now(),
+      ));
+    }
+    // Upcoming exam
+    if (state.upcomingExams.isNotEmpty) {
+      final ex = state.upcomingExams.first;
+      items.add(RecentActivity(
+        icon: Icons.event_rounded,
+        title: ex.title,
+        subtitle: isBangla
+            ? '${daysUntilDate(ex.examDate)} দিন বাকি'
+            : 'in ${daysUntilDate(ex.examDate)} days',
+        timestamp: ex.examDate,
+      ));
+    }
+    return items;
+  }
+}
+
+int daysUntilDate(DateTime date) {
+  final today = DateTime.now();
+  final d0 = DateTime(today.year, today.month, today.day);
+  final d1 = DateTime(date.year, date.month, date.day);
+  return d1.difference(d0).inDays;
 }
 
 class _SectionTitle extends StatelessWidget {
@@ -121,6 +213,57 @@ class _SectionTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(title, style: AppTextStyles.titleLarge),
+    );
+  }
+}
+
+class _FreshInstallEmptyState extends StatelessWidget {
+  const _FreshInstallEmptyState({
+    required this.onAddSubject,
+    required this.onAddTask,
+    required this.onStartStudy,
+  });
+  final VoidCallback onAddSubject;
+  final VoidCallback onAddTask;
+  final VoidCallback onStartStudy;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final isBangla = l10n.isBangla;
+    return Column(
+      children: [
+        AppEmptyState(
+          title: l10n.studyNow,
+          message: isBangla
+              ? 'FAB (+) থেকে যেকোনো জিনিস যোগ করুন, অথবা নিচের যেকোনো বোতামে চাপ দিন।'
+              : 'Tap the + button to add anything, or pick a starter below.',
+          icon: Icons.auto_awesome,
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: [
+            FilledButton.tonalIcon(
+              icon: const Icon(Icons.menu_book_rounded),
+              label: Text(l10n.addSubject),
+              onPressed: onAddSubject,
+            ),
+            FilledButton.tonalIcon(
+              icon: const Icon(Icons.task_alt_rounded),
+              label: Text(l10n.addAssignment),
+              onPressed: onAddTask,
+            ),
+            FilledButton.tonalIcon(
+              icon: const Icon(Icons.timer_outlined),
+              label: Text(l10n.startStudyCta),
+              onPressed: onStartStudy,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

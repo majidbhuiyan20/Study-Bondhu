@@ -1114,6 +1114,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get quick_add_flashcard => 'দ্রুত ফ্ল্যাশকার্ড যোগ';
 
   @override
+  String get quick_add_income => 'দ্রুত আয় যোগ';
+
+  @override
   String get quick_add_note => 'দ্রুত নোট যোগ';
 
   @override

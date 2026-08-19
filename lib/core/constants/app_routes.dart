@@ -15,7 +15,7 @@ class AppRoutes {
   // Subjects
   static const String subjectDetail = '/subjects/:id';
   static const String subjectAdd = '/subjects/add';
-  static const String topicAdd = '/subjects/:id/topics/add';
+  static const String topicAdd = '/topics/add';
   static const String semesters = '/semesters';
   static const String semesterTimeline = '/semesters/timeline';
 
@@ -82,4 +82,11 @@ class AppRoutes {
 
   // Local resources (spec #27)
   static const String resources = '/resources';
+
+  // Flashcards (spec #19)
+  static const String flashcardDeckAdd = '/flashcards/add';
+
+  // Expenses (spec #20) — single screen for expense + income
+  static const String expenseAdd = '/expenses/add';
+  static const String incomeAdd = '/income/add';
 }
