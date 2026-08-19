@@ -32,6 +32,7 @@ class AppDrawer extends ConsumerWidget {
     final settings = ref.watch(settingsViewModelProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final location = GoRouterState.of(context).uri.toString();
 
     return Drawer(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -56,9 +57,10 @@ class AppDrawer extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
                 children: [
-                  _SectionTitle(text: l10n.drawerDashboard),
+                  _SectionTitle(
+                      text: l10n.isBangla ? 'হোম' : 'HOME'),
                   _DrawerTile(
-                    icon: Icons.home_rounded,
+                    icon: Icons.dashboard_rounded,
                     label: l10n.drawerDashboard,
                     route: AppRoutes.shell,
                   ),
@@ -77,8 +79,14 @@ class AppDrawer extends ConsumerWidget {
                     label: l10n.drawerExams,
                     route: AppRoutes.exams,
                   ),
+                  _DrawerTile(
+                    icon: Icons.timer_outlined,
+                    label: l10n.isBangla ? 'পড়ার লগ' : 'Study log',
+                    route: AppRoutes.studyLog,
+                  ),
                   const SizedBox(height: 8),
-                  _SectionTitle(text: l10n.drawerAttendance),
+                  _SectionTitle(
+                      text: l10n.isBangla ? 'ট্র্যাক' : 'TRACK'),
                   _DrawerTile(
                     icon: Icons.event_available_rounded,
                     label: l10n.drawerAttendance,
@@ -90,17 +98,34 @@ class AppDrawer extends ConsumerWidget {
                     route: AppRoutes.revision,
                   ),
                   _DrawerTile(
+                    icon: Icons.calendar_view_week_rounded,
+                    label: l10n.drawerRoutines,
+                    route: AppRoutes.routines,
+                  ),
+                  _DrawerTile(
+                    icon: Icons.event_note_rounded,
+                    label:
+                        l10n.isBangla ? 'ক্লাস রুটিন' : 'Class routine',
+                    route: AppRoutes.timetable,
+                  ),
+                  _DrawerTile(
                     icon: Icons.bar_chart_rounded,
                     label: l10n.drawerAnalytics,
                     route: AppRoutes.analytics,
                   ),
                   _DrawerTile(
-                    icon: Icons.flag_rounded,
-                    label: l10n.drawerGoals,
-                    route: AppRoutes.analytics,
+                    icon: Icons.local_fire_department_rounded,
+                    label: l10n.isBangla ? 'স্ট্রিক' : 'Streak',
+                    route: AppRoutes.streak,
                   ),
                   const SizedBox(height: 8),
-                  _SectionTitle(text: l10n.notes),
+                  _SectionTitle(
+                      text: l10n.isBangla ? 'লাইব্রেরি' : 'LIBRARY'),
+                  _DrawerTile(
+                    icon: Icons.account_circle_rounded,
+                    label: l10n.profileChip,
+                    route: AppRoutes.profiles,
+                  ),
                   _DrawerTile(
                     icon: Icons.note_alt_rounded,
                     label: l10n.drawerNotes,
@@ -117,19 +142,18 @@ class AppDrawer extends ConsumerWidget {
                     route: AppRoutes.expenses,
                   ),
                   _DrawerTile(
-                    icon: Icons.calendar_view_week_rounded,
-                    label: l10n.drawerRoutines,
-                    route: AppRoutes.routines,
-                  ),
-                  _DrawerTile(
-                    icon: Icons.event_note_rounded,
-                    label: l10n.isBangla ? 'ক্লাস রুটিন' : 'Class routine',
-                    route: AppRoutes.timetable,
-                  ),
-                  _DrawerTile(
                     icon: Icons.folder_outlined,
-                    label: l10n.isBangla ? 'ফাইল রিসোর্স' : 'File resources',
+                    label: l10n.isBangla
+                        ? 'ফাইল রিসোর্স'
+                        : 'File resources',
                     route: AppRoutes.resources,
+                  ),
+                  _DrawerTile(
+                    icon: Icons.school_rounded,
+                    label: l10n.isBangla
+                        ? 'সেমিস্টার'
+                        : 'Semesters',
+                    route: AppRoutes.semesters,
                   ),
                   _DrawerTile(
                     icon: Icons.timeline_rounded,
@@ -137,17 +161,62 @@ class AppDrawer extends ConsumerWidget {
                     route: AppRoutes.semesterTimeline,
                   ),
                   const SizedBox(height: 8),
-                  _SectionTitle(text: l10n.drawerSettings),
+                  _SectionTitle(
+                      text: l10n.isBangla ? 'টুলস' : 'TOOLS'),
                   _DrawerTile(
                     icon: Icons.search_rounded,
                     label: l10n.drawerSearch,
                     route: AppRoutes.search,
                   ),
                   _DrawerTile(
+                    icon: Icons.cloud_off_rounded,
+                    label: l10n.isBangla
+                        ? 'ব্যাকআপ'
+                        : 'Backup',
+                    route: AppRoutes.backup,
+                  ),
+                  _DrawerTile(
                     icon: Icons.settings_rounded,
                     label: l10n.drawerSettings,
                     route: AppRoutes.settings,
                   ),
+                  if (location.startsWith('/settings')) ...[
+                    const SizedBox(height: 8),
+                    _SectionTitle(
+                        text: l10n.isBangla
+                            ? 'সেটিংস সাব-পেজ'
+                            : 'SETTINGS SUB-PAGES'),
+                    _DrawerTile(
+                      icon: Icons.translate_rounded,
+                      label: l10n.language,
+                      route: AppRoutes.settingsLanguage,
+                      indent: true,
+                    ),
+                    _DrawerTile(
+                      icon: Icons.brightness_6_rounded,
+                      label: l10n.theme,
+                      route: AppRoutes.settingsTheme,
+                      indent: true,
+                    ),
+                    _DrawerTile(
+                      icon: Icons.notifications_active_rounded,
+                      label: l10n.notifications,
+                      route: AppRoutes.settingsNotifications,
+                      indent: true,
+                    ),
+                    _DrawerTile(
+                      icon: Icons.cloud_off_rounded,
+                      label: l10n.backup,
+                      route: AppRoutes.settingsBackup,
+                      indent: true,
+                    ),
+                    _DrawerTile(
+                      icon: Icons.info_outline_rounded,
+                      label: l10n.drawerAbout,
+                      route: AppRoutes.settingsAbout,
+                      indent: true,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -278,7 +347,7 @@ class _ProfileHeader extends StatelessWidget {
         onTap: onTap,
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(20, 18, 16, 18),
+          padding: const EdgeInsets.fromLTRB(20, 22, 16, 22),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -300,8 +369,8 @@ class _ProfileHeader extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 52,
-                    height: 52,
+                    width: 56,
+                    height: 56,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white.withValues(alpha: 0.25),
@@ -318,7 +387,7 @@ class _ProfileHeader extends StatelessWidget {
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
-                        fontSize: 22,
+                        fontSize: 24,
                       ),
                     ),
                   ),
@@ -354,6 +423,29 @@ class _ProfileHeader extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.8)),
                 ],
               ),
+              const SizedBox(height: 12),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.bolt_rounded,
+                        size: 14, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      'StudyBondhu',
+                      style: AppTextStyles.label.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -373,14 +465,28 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-      child: Text(
-        text.toUpperCase(),
-        style: AppTextStyles.label.copyWith(
-          color: ThemeColors.textTertiary(context),
-          letterSpacing: 1.0,
-          fontWeight: FontWeight.w700,
-        ),
+      padding: const EdgeInsets.fromLTRB(14, 14, 12, 6),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 14,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: AppTextStyles.label.copyWith(
+              color: ThemeColors.textSecondary(context),
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w800,
+              fontSize: 11,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -395,11 +501,13 @@ class _DrawerTile extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.route,
+    this.indent = false,
   });
 
   final IconData icon;
   final String label;
   final String route;
+  final bool indent;
 
   @override
   Widget build(BuildContext context) {
@@ -407,7 +515,9 @@ class _DrawerTile extends StatelessWidget {
     final selected = location == route ||
         (route == AppRoutes.shell && location.startsWith('/shell'));
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      margin: EdgeInsets.symmetric(
+          horizontal: 6,
+          vertical: indent ? 1 : 2),
       decoration: BoxDecoration(
         color: selected
             ? AppColors.primary.withValues(alpha: 0.12)
@@ -415,16 +525,21 @@ class _DrawerTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
+        dense: indent,
+        visualDensity: indent ? VisualDensity.compact : null,
+        contentPadding: EdgeInsets.symmetric(
+            horizontal: indent ? 18 : 12, vertical: 0),
         leading: Icon(
           icon,
           color: selected
               ? AppColors.primary
               : ThemeColors.textSecondary(context),
-          size: 22,
+          size: indent ? 18 : 22,
         ),
         title: Text(
           label,
-          style: AppTextStyles.bodyMedium.copyWith(
+          style: (indent ? AppTextStyles.bodySmall : AppTextStyles.bodyMedium)
+              .copyWith(
             color: selected
                 ? AppColors.primary
                 : ThemeColors.textPrimary(context),
