@@ -81,6 +81,20 @@ class LocalStorageService {
 
   Future<void> clearAll() => _prefs.clear();
 
+  // ----- Active profile -----
+  // Null when no preference has been recorded yet — callers should fall
+  // back to the first profile in that case.
+  String? get activeProfileId =>
+      _prefs.getString(AppConstants.prefActiveProfileId);
+
+  Future<void> setActiveProfileId(String? id) async {
+    if (id == null) {
+      await _prefs.remove(AppConstants.prefActiveProfileId);
+    } else {
+      await _prefs.setString(AppConstants.prefActiveProfileId, id);
+    }
+  }
+
   // Convenience
   ThemeMode get themeModeEnum {
     switch (themeMode) {

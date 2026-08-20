@@ -70,6 +70,8 @@ class AppRoutes {
 
   // Profile (class/grade)
   static const String profiles = '/profiles';
+  // Dedicated single-profile detail screen (active profile).
+  static const String profile = '/profile';
 
   // Routines (recurring assignments)
   static const String routines = '/routines';

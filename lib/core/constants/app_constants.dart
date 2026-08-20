@@ -23,6 +23,10 @@ class AppConstants {
   static const String prefNotifDailyGoal = 'pref_notif_daily_goal';
   static const String prefNotifAttendance = 'pref_notif_attendance';
 
+  // Active profile selection (so the chosen profile persists across
+  // launches). Null means "auto-pick the first".
+  static const String prefActiveProfileId = 'pref_active_profile_id';
+
   // Defaults
   static const int defaultDailyGoalMinutes = 180;
 

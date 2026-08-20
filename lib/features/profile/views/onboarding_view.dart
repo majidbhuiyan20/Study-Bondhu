@@ -140,6 +140,9 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
     final institution = _institutionCtl.text.trim().isEmpty
         ? null
         : _institutionCtl.text.trim();
+    // Create the profile AND mark it active in one step so the home
+    // greeting, drawer header, and dedicated profile screen all see it
+    // immediately after onboarding finishes.
     await ref.read(profileViewModelProvider.notifier).addProfile(
           Profile(
             name: name,
@@ -148,6 +151,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
             institution: institution,
             createdAt: DateTime.now(),
           ),
+          setAsActive: true,
         );
 
     // Subjects — drop any blank rows defensively (UI prevents them but

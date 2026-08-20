@@ -124,7 +124,7 @@ class AppDrawer extends ConsumerWidget {
                   _DrawerTile(
                     icon: Icons.account_circle_rounded,
                     label: l10n.profileChip,
-                    route: AppRoutes.profiles,
+                    route: AppRoutes.profile,
                   ),
                   _DrawerTile(
                     icon: Icons.note_alt_rounded,

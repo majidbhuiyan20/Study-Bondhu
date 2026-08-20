@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/analytics/views/analytics_view.dart';
 import '../features/assignments/views/assignment_add_view.dart';
 import '../features/assignments/views/assignments_view.dart';
 import '../features/attendance/views/attendance_view.dart';
@@ -15,6 +16,7 @@ import '../features/flashcards/views/flashcards_view.dart';
 import '../features/home/views/main_shell.dart';
 import '../features/notes/views/notes_view.dart';
 import '../features/profile/views/onboarding_view.dart';
+import '../features/profile/views/profile_view.dart';
 import '../features/profile/views/profiles_view.dart';
 import '../features/profile/views/streak_view.dart';
 import '../features/profile/views/backup_view.dart';
@@ -23,6 +25,7 @@ import '../features/routines/views/routines_view.dart';
 import '../features/timetable/views/timetable_view.dart';
 import '../features/resources/views/resources_view.dart';
 import '../features/search/views/search_view.dart';
+import '../features/settings/views/settings_view.dart';
 import '../features/study/views/study_log_view.dart';
 import '../features/study/views/study_view.dart';
 import '../features/subjects/views/semesters_view.dart';
@@ -62,6 +65,10 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.study,
         builder: (context, state) => const StudyView(),
+      ),
+      GoRoute(
+        path: AppRoutes.analytics,
+        builder: (context, state) => const AnalyticsView(),
       ),
       GoRoute(
         path: AppRoutes.assignments,
@@ -156,6 +163,10 @@ GoRouter buildRouter() {
         builder: (context, state) => const ProfilesView(),
       ),
       GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileView(),
+      ),
+      GoRoute(
         path: AppRoutes.routines,
         builder: (context, state) => const RoutinesView(),
       ),
@@ -178,6 +189,32 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.search,
         builder: (context, state) => const SearchView(),
+      ),
+      // Direct top-level views for tab destinations that are also
+      // surfaced from the drawer (so users can deep-link or push).
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (context, state) => const SettingsView(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsLanguage,
+        builder: (context, state) => const SettingsView(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsTheme,
+        builder: (context, state) => const SettingsView(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsNotifications,
+        builder: (context, state) => const SettingsView(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsBackup,
+        builder: (context, state) => const SettingsView(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsAbout,
+        builder: (context, state) => const SettingsView(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -7,8 +7,9 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_empty_state.dart';
-import '../models/profile.dart';
+import '../models/profile.dart' show ProfileLevelX;
 import '../view_models/profile_view_model.dart';
+import '../widgets/edit_profile_sheet.dart';
 
 class ProfilesView extends ConsumerStatefulWidget {
   const ProfilesView({super.key});
@@ -36,7 +37,8 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
       appBar: AppBar(title: const Text('Class / Semester')),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab-profiles',
-        onPressed: () => _editProfile(context, null),
+        onPressed: () =>
+            showEditProfileSheet(context, setAsActive: true),
         icon: const Icon(Icons.add),
         label: const Text('Add'),
         backgroundColor: AppColors.primary,
@@ -122,7 +124,8 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                             ),
                           ),
                           IconButton(
-                            onPressed: () => _editProfile(context, p),
+                            onPressed: () =>
+                                showEditProfileSheet(context, existing: p),
                             icon: const Icon(Icons.edit_outlined),
                             tooltip: l10n.edit,
                           ),
@@ -162,140 +165,6 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                     );
                   },
                 ),
-    );
-  }
-
-  Future<void> _editProfile(BuildContext context, Profile? existing) async {
-    final name = TextEditingController(text: existing?.name ?? '');
-    final instCtl =
-        TextEditingController(text: existing?.institution ?? '');
-    ProfileLevel level = existing?.level ?? ProfileLevel.school;
-    String? classLabel = existing?.classLabel;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
-          ),
-          child: StatefulBuilder(
-            builder: (ctx, setSt) => SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    existing == null ? 'New profile' : 'Edit profile',
-                    style: AppTextStyles.titleLarge,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: name,
-                    decoration: const InputDecoration(
-                      labelText: 'Profile name',
-                      hintText: 'e.g. SSC 2026',
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<ProfileLevel>(
-                    value: level,
-                    decoration:
-                        const InputDecoration(labelText: 'Education level'),
-                    items: ProfileLevel.values
-                        .map((l) => DropdownMenuItem(
-                              value: l,
-                              child: Text(l.en),
-                            ))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) {
-                        setSt(() {
-                          level = v;
-                          // Reset class label if it isn't valid for new level.
-                          if (classLabel != null &&
-                              !v.classOptions.contains(classLabel)) {
-                            classLabel = null;
-                          }
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: classLabel,
-                    decoration:
-                        const InputDecoration(labelText: 'Class / Year'),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: Text('Select...'),
-                      ),
-                      ...level.classOptions.map((o) => DropdownMenuItem(
-                            value: o,
-                            child: Text(o),
-                          )),
-                    ],
-                    onChanged: (v) => setSt(() => classLabel = v),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: instCtl,
-                    decoration: const InputDecoration(
-                      labelText: 'Institution (optional)',
-                      hintText: 'e.g. Rajuk Uttara Model College',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (name.text.trim().isEmpty) return;
-                            final p = Profile(
-                              id: existing?.id,
-                              name: name.text.trim(),
-                              level: level,
-                              classLabel: classLabel,
-                              institution: instCtl.text.trim().isEmpty
-                                  ? null
-                                  : instCtl.text.trim(),
-                              createdAt: existing?.createdAt ?? DateTime.now(),
-                            );
-                            if (existing == null) {
-                              await ref
-                                  .read(profileViewModelProvider.notifier)
-                                  .addProfile(p);
-                            } else {
-                              await ref
-                                  .read(profileViewModelProvider.notifier)
-                                  .updateProfile(p);
-                            }
-                            if (ctx.mounted) Navigator.pop(ctx);
-                          },
-                          child: Text(existing == null ? 'Create' : 'Save'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }

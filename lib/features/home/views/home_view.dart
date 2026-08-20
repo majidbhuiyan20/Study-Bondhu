@@ -68,9 +68,27 @@ class _HomeViewState extends ConsumerState<HomeView> {
           builder: (ctx) => IconButton(
             icon: const Icon(Icons.menu_rounded),
             tooltip: l10n.drawerMenu,
-            onPressed: () => Scaffold.of(ctx).openDrawer(),
+            // `ctx` lives below this inner Scaffold, so
+            // `Scaffold.of(ctx)` returns this widget (which has no
+            // drawer). The outer Scaffold (in MainShell) that owns the
+            // AppDrawer is an *ancestor* of this widget — call
+            // `Scaffold.of` on `context` (the build method's context,
+            // captured before this inner Scaffold was built).
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_rounded),
+            tooltip: l10n.profileChip,
+            onPressed: () => context.push(AppRoutes.profile),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.settings,
+            onPressed: () => context.push(AppRoutes.settings),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'fab-home',
