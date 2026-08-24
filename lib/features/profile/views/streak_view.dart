@@ -645,12 +645,12 @@ class _YearHeatmap365State extends State<_YearHeatmap365> {
                   for (int d = 0; d < 7; d++)
                     SizedBox(
                       height: cellSize + cellGap,
-                      child: d.isEven
+                      child: (d == 0 || d == 2 || d == 4)
                           ? Align(
                               alignment: Alignment.topLeft,
                               child: Text(
                                 l10n.isBangla
-                                    ? weekdayLabelsBn[d ~/ 2]
+                                    ? weekdayLabelsBn[(d - 0) ~/ 2]
                                     : weekdayLabelsEn[d ~/ 2],
                                 style: TextStyle(
                                   fontSize: 9,

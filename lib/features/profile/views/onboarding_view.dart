@@ -178,7 +178,9 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
 
     await LocalStorageService.instance.setOnboardingDone(true);
     if (!mounted) return;
-    context.go(AppRoutes.shell);
+    // Land on the subjects screen so the user sees the rows they just
+    // created and can add more without having to navigate.
+    context.go(AppRoutes.subjects);
   }
 
   @override

@@ -11,8 +11,6 @@ import '../features/exams/views/exams_view.dart';
 import '../features/expenses/views/expense_add_view.dart';
 import '../features/expenses/views/expenses_view.dart';
 import '../features/expenses/views/income_add_view.dart';
-import '../features/flashcards/views/flashcard_deck_add_view.dart';
-import '../features/flashcards/views/flashcards_view.dart';
 import '../features/home/views/main_shell.dart';
 import '../features/notes/views/notes_view.dart';
 import '../features/profile/views/onboarding_view.dart';
@@ -32,6 +30,7 @@ import '../features/subjects/views/semesters_view.dart';
 import '../features/subjects/views/semester_timeline_view.dart';
 import '../features/subjects/views/subject_add_view.dart';
 import '../features/subjects/views/subject_detail_view.dart';
+import '../features/subjects/views/subjects_view.dart';
 import '../features/subjects/views/topic_add_view.dart';
 import '../core/services/local_storage_service.dart';
 import 'constants/app_routes.dart';
@@ -59,6 +58,12 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.shell,
         builder: (context, state) => const MainShell(),
+      ),
+      // Direct route to the subjects list. Used after onboarding so the
+      // user lands on the same screen they'll see in the "Subjects" tab.
+      GoRoute(
+        path: AppRoutes.subjects,
+        builder: (context, state) => const SubjectsView(),
       ),
       // Direct views for tab destinations (used by recommendation cards
       // and "see all" links that want to open the tab as its own page).
@@ -137,14 +142,6 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.notes,
         builder: (context, state) => const NotesView(),
-      ),
-      GoRoute(
-        path: AppRoutes.flashcards,
-        builder: (context, state) => const FlashcardsView(),
-      ),
-      GoRoute(
-        path: AppRoutes.flashcardDeckAdd,
-        builder: (context, state) => const FlashcardDeckAddView(),
       ),
       GoRoute(
         path: AppRoutes.expenses,

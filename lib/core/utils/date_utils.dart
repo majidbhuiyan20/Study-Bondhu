@@ -7,6 +7,13 @@ class AppDateUtils {
 
   static DateTime _stripTime(DateTime d) => DateTime(d.year, d.month, d.day);
 
+  /// Returns 08:00 local on the same calendar day as [date]. Use this
+  /// when scheduling future revisions so the morning notification fires
+  /// at a predictable time of day (and never at, say, 02:47 because the
+  /// user happened to mark the previous revision done at night).
+  static DateTime morningOf(DateTime date) =>
+      DateTime(date.year, date.month, date.day, 8);
+
   static DateTime startOfWeek(DateTime date) {
     final d = _stripTime(date);
     return d.subtract(Duration(days: d.weekday - 1));

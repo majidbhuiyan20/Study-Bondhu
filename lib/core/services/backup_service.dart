@@ -34,8 +34,6 @@ class BackupService {
     Tables.studySessions,
     Tables.revisionItems,
     Tables.notes,
-    Tables.flashcards,
-    Tables.flashcardReviews,
     Tables.expenses,
     Tables.goals,
   ];

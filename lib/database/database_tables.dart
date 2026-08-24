@@ -142,6 +142,7 @@ class Columns {
   static const String revisionDate = 'scheduled_date';
   static const String revisionStatus = 'status'; // pending/done/missed
   static const String revisionInterval = 'interval_days';
+  static const String revisionRating = 'rating'; // 1=weak / 3=okay / 5=strong
 
   // Notes
   static const String noteSubjectId = 'subject_id';

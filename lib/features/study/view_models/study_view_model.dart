@@ -127,6 +127,16 @@ class TimerViewModel extends StateNotifier<TimerState> {
     int? topicId,
     StudyMode mode = StudyMode.focus,
   }) {
+    // Validation: a session must be tied to a subject so attendance,
+    // analytics, and revision scheduling have a meaningful scope.
+    // The UI disables the Start button until a subject is picked, but
+    // this guard catches any programmatic misuse.
+    if (subjectId == null) {
+      throw ArgumentError(
+        'TimerViewModel.start() requires a non-null subjectId. '
+        'Ask the user to pick a subject before starting a session.',
+      );
+    }
     _startedAt = DateTime.now();
     _accumulated = Duration.zero;
     state = state.copyWith(

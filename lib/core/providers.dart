@@ -10,7 +10,6 @@ import '../features/attendance/repositories/attendance_repository.dart';
 import '../features/study/repositories/study_repository.dart';
 import '../features/revision/repositories/revision_repository.dart';
 import '../features/notes/repositories/notes_repository.dart';
-import '../features/flashcards/repositories/flashcards_repository.dart';
 import '../features/expenses/repositories/expenses_repository.dart';
 import '../features/analytics/repositories/analytics_repository.dart';
 import '../features/profile/repositories/profile_repository.dart';
@@ -47,9 +46,6 @@ final revisionRepositoryProvider = Provider<RevisionRepository>(
 
 final notesRepositoryProvider = Provider<NotesRepository>(
     (ref) => NotesRepository(ref.watch(databaseProvider)));
-
-final flashcardsRepositoryProvider = Provider<FlashcardsRepository>(
-    (ref) => FlashcardsRepository(ref.watch(databaseProvider)));
 
 final expensesRepositoryProvider = Provider<ExpensesRepository>(
     (ref) => ExpensesRepository(ref.watch(databaseProvider)));

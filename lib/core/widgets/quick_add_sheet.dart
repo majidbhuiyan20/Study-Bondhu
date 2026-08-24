@@ -67,11 +67,6 @@ class QuickAddSheet extends StatelessWidget {
         onTap: () => context.push(AppRoutes.attendance),
       ),
       _QuickTile(
-        icon: Icons.style_outlined,
-        label: l10n.quickAddFlashcard,
-        onTap: () => context.push(AppRoutes.flashcardDeckAdd),
-      ),
-      _QuickTile(
         icon: Icons.attach_money_rounded,
         label: l10n.quickAddExpense,
         onTap: () => context.push(AppRoutes.expenseAdd),

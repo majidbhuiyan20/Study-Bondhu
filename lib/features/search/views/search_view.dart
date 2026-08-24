@@ -11,7 +11,6 @@ import '../../../core/theme/theme_colors.dart';
 import '../../../core/widgets/app_empty_state.dart';
 import '../../assignments/repositories/assignments_repository.dart';
 import '../../exams/repositories/exams_repository.dart';
-import '../../flashcards/repositories/flashcards_repository.dart';
 import '../../notes/repositories/notes_repository.dart';
 import '../../subjects/repositories/subjects_repository.dart';
 
@@ -38,7 +37,6 @@ enum SearchHitKind {
   assignment,
   exam,
   note,
-  flashcard,
 }
 
 extension SearchHitKindX on SearchHitKind {
@@ -54,8 +52,6 @@ extension SearchHitKindX on SearchHitKind {
         return Icons.event_note_rounded;
       case SearchHitKind.note:
         return Icons.note_alt_rounded;
-      case SearchHitKind.flashcard:
-        return Icons.style_rounded;
     }
   }
 
@@ -71,8 +67,6 @@ extension SearchHitKindX on SearchHitKind {
         return 'Exam';
       case SearchHitKind.note:
         return 'Note';
-      case SearchHitKind.flashcard:
-        return 'Flashcard';
     }
   }
 }
@@ -97,7 +91,6 @@ final searchResultsProvider =
   final assignmentsRepo = ref.watch(assignmentsRepositoryProvider);
   final examsRepo = ref.watch(examsRepositoryProvider);
   final notesRepo = ref.watch(notesRepositoryProvider);
-  final flashcardsRepo = ref.watch(flashcardsRepositoryProvider);
 
   // Run all searches in parallel.
   final results = await Future.wait<List<SearchHit>>([
@@ -106,7 +99,6 @@ final searchResultsProvider =
     _searchAssignments(assignmentsRepo, query),
     _searchExams(examsRepo, query),
     _searchNotes(notesRepo, query),
-    _searchFlashcards(flashcardsRepo, query),
   ]);
   return results.expand((x) => x).toList(growable: false);
 });
@@ -190,39 +182,6 @@ Future<List<SearchHit>> _searchNotes(
             subjectId: n.subjectId,
           ))
       .toList(growable: false);
-}
-
-Future<List<SearchHit>> _searchFlashcards(
-    FlashcardsRepository repo, String query) async {
-  // Search across all decks and all cards.
-  final decks = await repo.getDecks();
-  final hits = <SearchHit>[];
-  for (final d in decks) {
-    if (d.name.toLowerCase().contains(query)) {
-      hits.add(SearchHit(
-        kind: SearchHitKind.flashcard,
-        id: d.id ?? 0,
-        title: d.name,
-        subtitle: 'Deck',
-        subjectId: d.subjectId,
-      ));
-    }
-    if (d.id == null) continue;
-    final cards = await repo.getCards(d.id!);
-    for (final c in cards) {
-      if (c.front.toLowerCase().contains(query) ||
-          c.back.toLowerCase().contains(query)) {
-        hits.add(SearchHit(
-          kind: SearchHitKind.flashcard,
-          id: c.id ?? 0,
-          title: c.front,
-          subtitle: '${d.name} • card',
-          subjectId: d.subjectId,
-        ));
-      }
-    }
-  }
-  return hits;
 }
 
 class SearchView extends ConsumerStatefulWidget {
@@ -377,9 +336,6 @@ class _HitTile extends StatelessWidget {
           ':id',
           hit.id.toString(),
         ));
-        break;
-      case SearchHitKind.flashcard:
-        context.push(AppRoutes.flashcards);
         break;
     }
   }

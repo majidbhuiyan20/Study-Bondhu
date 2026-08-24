@@ -216,6 +216,7 @@ class AppDatabase {
         ${Columns.revisionDate} INTEGER NOT NULL,
         ${Columns.revisionStatus} TEXT NOT NULL DEFAULT 'pending',
         ${Columns.revisionInterval} INTEGER NOT NULL DEFAULT 1,
+        ${Columns.revisionRating} INTEGER,
         ${Columns.createdAt} INTEGER NOT NULL,
         FOREIGN KEY(${Columns.revisionSubjectId}) REFERENCES ${Tables.subjects}(${Columns.id}) ON DELETE SET NULL,
         FOREIGN KEY(${Columns.revisionTopicId}) REFERENCES ${Tables.topics}(${Columns.id}) ON DELETE SET NULL
@@ -358,6 +359,10 @@ class AppDatabase {
         'CREATE INDEX idx_exams_date ON ${Tables.exams}(${Columns.examDate})');
     batch.execute(
         'CREATE INDEX idx_timetable_day ON ${Tables.timetable}(${Columns.classDayOfWeek})');
+    batch.execute(
+        'CREATE INDEX idx_revision_topic_date ON ${Tables.revisionItems}(${Columns.revisionTopicId}, ${Columns.revisionDate})');
+    batch.execute(
+        'CREATE INDEX idx_revision_status_date ON ${Tables.revisionItems}(${Columns.revisionStatus}, ${Columns.revisionDate})');
 
     await batch.commit(noResult: true);
   }
@@ -525,6 +530,19 @@ class AppDatabase {
           'ALTER TABLE ${Tables.expenses} ADD COLUMN ${Columns.expenseType} TEXT NOT NULL DEFAULT \'expense\'',
         );
       } catch (_) {/* already migrated */}
+    }
+    if (oldVersion < 8) {
+      // v7 → v8: persist the user's revision rating and add indexes
+      // that the spaced-repetition engine relies on.
+      try {
+        await db.execute(
+          'ALTER TABLE ${Tables.revisionItems} ADD COLUMN ${Columns.revisionRating} INTEGER',
+        );
+      } catch (_) {/* already migrated */}
+      await db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_revision_topic_date ON ${Tables.revisionItems}(${Columns.revisionTopicId}, ${Columns.revisionDate})');
+      await db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_revision_status_date ON ${Tables.revisionItems}(${Columns.revisionStatus}, ${Columns.revisionDate})');
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_routes.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -23,6 +25,7 @@ class TimerPanel extends ConsumerStatefulWidget {
 class _TimerPanelState extends ConsumerState<TimerPanel> {
   int? _subjectId;
   StudyMode _mode = StudyMode.focus;
+  bool _showSubjectMissingError = false;
 
   @override
   void initState() {
@@ -48,10 +51,25 @@ class _TimerPanelState extends ConsumerState<TimerPanel> {
   }
 
   Future<void> _start() async {
-    ref.read(timerViewModelProvider.notifier).start(
-          subjectId: _subjectId,
-          mode: _mode,
-        );
+    // Defense in depth: the Start button is disabled when _subjectId is
+    // null, but if it's somehow tapped (focus traversal, accessibility),
+    // we exit silently rather than starting a session with no subject.
+    if (_subjectId == null) {
+      setState(() => _showSubjectMissingError = true);
+      return;
+    }
+    try {
+      ref.read(timerViewModelProvider.notifier).start(
+            subjectId: _subjectId,
+            mode: _mode,
+          );
+    } on ArgumentError {
+      // The VM rejected the call — surface the same inline error.
+      if (!mounted) return;
+      setState(() => _showSubjectMissingError = true);
+      return;
+    }
+    setState(() => _showSubjectMissingError = false);
     setState(() {});
   }
 
@@ -272,21 +290,69 @@ class _TimerPanelState extends ConsumerState<TimerPanel> {
             ),
             const SizedBox(height: 12),
             subjectsAsync.when(
-              data: (subjects) => DropdownButtonFormField<int?>(
-                value: _subjectId,
-                decoration: const InputDecoration(
-                  hintText: 'Pick subject (optional)',
-                  contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
-                ),
-                items: [
-                  const DropdownMenuItem(
-                      value: null, child: Text('No subject')),
-                  ...subjects.map((s) => DropdownMenuItem(
-                      value: s.id, child: Text(s.name))),
-                ],
-                onChanged: (v) => setState(() => _subjectId = v),
-              ),
+              data: (subjects) {
+                if (subjects.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.warning.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline,
+                            color: AppColors.warning, size: 20),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Add a subject before starting a session.',
+                            style: AppTextStyles.bodySmall,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              context.push(AppRoutes.subjectAdd),
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownButtonFormField<int?>(
+                      // value must match the selected item; using null
+                      // initially so Flutter shows the hint until the user
+                      // picks one.
+                      initialValue: _subjectId,
+                      decoration: InputDecoration(
+                        hintText: 'Pick a subject',
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        errorText: _showSubjectMissingError
+                            ? 'Please pick a subject to start studying'
+                            : null,
+                      ),
+                      items: subjects
+                          .map((s) => DropdownMenuItem<int?>(
+                                value: s.id,
+                                child: Text(s.name),
+                              ))
+                          .toList(growable: false),
+                      onChanged: (v) {
+                        setState(() {
+                          _subjectId = v;
+                          _showSubjectMissingError = false;
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
               loading: () => const LinearProgressIndicator(),
               error: (e, _) => Text('Error: $e'),
             ),
@@ -294,7 +360,7 @@ class _TimerPanelState extends ConsumerState<TimerPanel> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: _start,
+                onPressed: _subjectId == null ? null : _start,
                 icon: const Icon(Icons.play_arrow_rounded),
                 label: const Text('Start session'),
                 style: ElevatedButton.styleFrom(

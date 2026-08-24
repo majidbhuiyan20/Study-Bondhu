@@ -47,11 +47,6 @@ class AppRoutes {
   static const String noteEditor = '/notes/editor';
   static const String noteDetail = '/notes/:id';
 
-  // Flashcards
-  static const String flashcards = '/flashcards';
-  static const String flashcardDeck = '/flashcards/:id';
-  static const String flashcardStudy = '/flashcards/:id/study';
-
   // Expenses
   static const String expenses = '/expenses';
 
@@ -84,9 +79,6 @@ class AppRoutes {
 
   // Local resources (spec #27)
   static const String resources = '/resources';
-
-  // Flashcards (spec #19)
-  static const String flashcardDeckAdd = '/flashcards/add';
 
   // Expenses (spec #20) — single screen for expense + income
   static const String expenseAdd = '/expenses/add';

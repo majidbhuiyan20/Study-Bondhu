@@ -116,6 +116,50 @@ class SubjectsRepository {
     return rows.map(Topic.fromMap).toList();
   }
 
+  /// O(1) single-row lookup. Use this instead of fetching all topics and
+  /// iterating when only one is needed — e.g. inside the revision engine.
+  Future<Topic?> getTopicById(int id) async {
+    final db = await _db.database;
+    final rows = await db.query(Tables.topics,
+        where: '${Columns.id} = ?', whereArgs: [id], limit: 1);
+    if (rows.isEmpty) return null;
+    return Topic.fromMap(rows.first);
+  }
+
+  /// Bulk lookup, used by the revision view to render rows in O(1)
+  /// rather than scanning the entire topics table per row.
+  Future<Map<int, Topic>> getTopicsByIds(Iterable<int> ids) async {
+    if (ids.isEmpty) return const {};
+    final list = ids.toList();
+    final db = await _db.database;
+    final placeholders = List.filled(list.length, '?').join(',');
+    final rows = await db.query(
+      Tables.topics,
+      where: '${Columns.id} IN ($placeholders)',
+      whereArgs: list,
+    );
+    return {
+      for (final t in rows.map(Topic.fromMap))
+        if (t.id != null) t.id!: t,
+    };
+  }
+
+  Future<Map<int, Subject>> getSubjectsByIds(Iterable<int> ids) async {
+    if (ids.isEmpty) return const {};
+    final list = ids.toList();
+    final db = await _db.database;
+    final placeholders = List.filled(list.length, '?').join(',');
+    final rows = await db.query(
+      Tables.subjects,
+      where: '${Columns.id} IN ($placeholders)',
+      whereArgs: list,
+    );
+    return {
+      for (final s in rows.map(Subject.fromMap))
+        if (s.id != null) s.id!: s,
+    };
+  }
+
   Future<int> addTopic(Topic t) async {
     final db = await _db.database;
     return db.insert(Tables.topics, t.toMap());

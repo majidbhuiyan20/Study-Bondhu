@@ -132,11 +132,6 @@ class AppDrawer extends ConsumerWidget {
                     route: AppRoutes.notes,
                   ),
                   _DrawerTile(
-                    icon: Icons.style_rounded,
-                    label: l10n.drawerFlashcards,
-                    route: AppRoutes.flashcards,
-                  ),
-                  _DrawerTile(
                     icon: Icons.payments_rounded,
                     label: l10n.drawerExpenses,
                     route: AppRoutes.expenses,

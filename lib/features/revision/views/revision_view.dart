@@ -6,7 +6,7 @@ import '../../../core/providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_colors.dart';
-import '../../../core/utils/date_utils.dart' as du;
+import '../../../core/utils/date_utils.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_empty_state.dart';
 import '../../../core/widgets/app_loading.dart';
@@ -37,6 +37,18 @@ class _RevisionViewState extends ConsumerState<RevisionView> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final state = ref.watch(revisionViewModelProvider);
+
+    // Surface errors from the VM as a snackbar, then clear.
+    ref.listen<RevisionState>(revisionViewModelProvider, (prev, next) {
+      final err = next.errorMessage;
+      if (err != null && err.isNotEmpty && prev?.errorMessage != err) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(err)));
+        ref.read(revisionViewModelProvider.notifier).clearError();
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(title: Text(l10n.revisionSchedule)),
       floatingActionButton: FloatingActionButton(
@@ -60,9 +72,14 @@ class _RevisionViewState extends ConsumerState<RevisionView> {
                       const SizedBox(height: 8),
                   itemBuilder: (_, i) {
                     final r = state.items[i];
+                    final isMutating =
+                        state.pendingMutationId != null &&
+                            state.pendingMutationId == r.id;
                     return _RevisionRow(
                       item: r,
-                      onDone: r.status == RevisionStatus.pending
+                      isMutating: isMutating,
+                      onDone: r.status == RevisionStatus.pending &&
+                              !isMutating
                           ? () => _showRatingSheet(context, r)
                           : null,
                       onDelete: () => r.id == null
@@ -89,6 +106,7 @@ class _RevisionViewState extends ConsumerState<RevisionView> {
     RevisionItem r,
   ) async {
     int rating = 3;
+    bool submitting = false;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -124,21 +142,27 @@ class _RevisionViewState extends ConsumerState<RevisionView> {
                       label: l10n.revisionRateWeak,
                       rating: 1,
                       selected: rating == 1,
-                      onTap: () => setSt(() => rating = 1),
+                      onTap: submitting
+                          ? null
+                          : () => setSt(() => rating = 1),
                     ),
                     const SizedBox(width: 8),
                     _RateChip(
                       label: l10n.revisionRateOkay,
                       rating: 3,
                       selected: rating == 3,
-                      onTap: () => setSt(() => rating = 3),
+                      onTap: submitting
+                          ? null
+                          : () => setSt(() => rating = 3),
                     ),
                     const SizedBox(width: 8),
                     _RateChip(
                       label: l10n.revisionRateStrong,
                       rating: 5,
                       selected: rating == 5,
-                      onTap: () => setSt(() => rating = 5),
+                      onTap: submitting
+                          ? null
+                          : () => setSt(() => rating = 5),
                     ),
                   ],
                 ),
@@ -147,20 +171,47 @@ class _RevisionViewState extends ConsumerState<RevisionView> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => Navigator.pop(ctx),
+                        onPressed: submitting
+                            ? null
+                            : () => Navigator.pop(ctx),
                         child: Text(l10n.cancel),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: FilledButton(
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          ref
-                              .read(revisionViewModelProvider.notifier)
-                              .markCompletedWithRating(r, rating);
-                        },
-                        child: Text(l10n.revisionMarkDone),
+                        onPressed: submitting
+                            ? null
+                            : () async {
+                                setSt(() => submitting = true);
+                                Navigator.pop(ctx);
+                                try {
+                                  await ref
+                                      .read(revisionViewModelProvider
+                                          .notifier)
+                                      .markCompletedWithRating(r, rating);
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(SnackBar(
+                                        content: Text(
+                                          'Failed to mark revision: $e',
+                                        ),
+                                      ));
+                                  }
+                                }
+                              },
+                        child: submitting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.textOnPrimary,
+                                ),
+                              )
+                            : Text(l10n.revisionMarkDone),
                       ),
                     ),
                   ],
@@ -177,18 +228,20 @@ class _RevisionViewState extends ConsumerState<RevisionView> {
 class _RevisionRow extends ConsumerWidget {
   const _RevisionRow({
     required this.item,
+    required this.isMutating,
     required this.onDone,
     required this.onDelete,
   });
 
   final RevisionItem item;
+  final bool isMutating;
   final VoidCallback? onDone;
   final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final subjectsAsync = ref.watch(_subjectsProvider);
-    final topicsAsync = ref.watch(_topicsProvider);
+    final subjectsAsync = ref.watch(pendingRevisionSubjectsProvider);
+    final topicsAsync = ref.watch(pendingRevisionTopicsProvider);
     return AppCard(
       child: Row(
         children: [
@@ -207,16 +260,7 @@ class _RevisionRow extends ConsumerWidget {
               children: [
                 Text(
                   subjectsAsync.maybeWhen(
-                    data: (subs) {
-                      if (item.subjectId == null) return 'General revision';
-                      final s = subs.firstWhere(
-                        (e) => e.id == item.subjectId,
-                        orElse: () => Subject(
-                            name: 'Subject',
-                            createdAt: DateTime.now()),
-                      );
-                      return s.name;
-                    },
+                    data: (subs) => _subjectName(subs, item),
                     orElse: () => 'Revision',
                   ),
                   style: const TextStyle(
@@ -225,13 +269,7 @@ class _RevisionRow extends ConsumerWidget {
                 if (item.topicId != null)
                   topicsAsync.maybeWhen(
                     data: (topics) {
-                      Topic? found;
-                      for (final t in topics) {
-                        if (t.id == item.topicId) {
-                          found = t;
-                          break;
-                        }
-                      }
+                      final found = topics[item.topicId];
                       if (found == null) return const SizedBox.shrink();
                       return Padding(
                         padding: const EdgeInsets.only(top: 2),
@@ -257,7 +295,7 @@ class _RevisionRow extends ConsumerWidget {
                     orElse: () => const SizedBox.shrink(),
                   ),
                 Text(
-                  'Due ${du.AppDateUtils.relative(item.scheduledDate)}',
+                  'Due ${AppDateUtils.relative(item.scheduledDate)}',
                   style: TextStyle(
                       color: ThemeColors.textSecondary(context),
                       fontSize: 12),
@@ -265,7 +303,16 @@ class _RevisionRow extends ConsumerWidget {
               ],
             ),
           ),
-          if (onDone != null)
+          if (isMutating)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else if (onDone != null)
             IconButton(
               onPressed: onDone,
               icon: const Icon(Icons.check),
@@ -279,6 +326,13 @@ class _RevisionRow extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _subjectName(Map<int, Subject> subs, RevisionItem item) {
+    if (item.subjectId == null) return 'General revision';
+    final s = subs[item.subjectId];
+    if (s == null) return 'Revision';
+    return s.name;
   }
 
   IconData _topicIcon(TopicStatus s) {
@@ -312,10 +366,6 @@ final _subjectsProvider = FutureProvider((ref) async {
   return ref.watch(subjectsRepositoryProvider).getSubjects();
 });
 
-final _topicsProvider = FutureProvider((ref) async {
-  return ref.watch(subjectsRepositoryProvider).getAllTopics();
-});
-
 class _RateChip extends StatelessWidget {
   const _RateChip({
     required this.label,
@@ -326,7 +376,7 @@ class _RateChip extends StatelessWidget {
   final String label;
   final int rating;
   final bool selected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -370,7 +420,9 @@ class _AddRevisionSheet extends ConsumerStatefulWidget {
 
 class _AddRevisionSheetState extends ConsumerState<_AddRevisionSheet> {
   int? _subjectId;
-  DateTime _date = DateTime.now().add(const Duration(days: 1));
+  DateTime _date = AppDateUtils.morningOf(
+    DateTime.now().add(const Duration(days: 1)),
+  );
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -380,7 +432,9 @@ class _AddRevisionSheetState extends ConsumerState<_AddRevisionSheet> {
           DateTime.now().add(const Duration(days: 365)),
       initialDate: _date,
     );
-    if (picked != null) setState(() => _date = picked);
+    if (picked != null) {
+      setState(() => _date = AppDateUtils.morningOf(picked));
+    }
   }
 
   @override
