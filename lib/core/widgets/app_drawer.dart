@@ -14,6 +14,7 @@ import '../l10n.dart'
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/theme_colors.dart';
+import 'profile_avatar.dart';
 
 /// A polished side drawer with:
 ///   - Profile header (name, level, class)
@@ -41,6 +42,7 @@ class AppDrawer extends ConsumerWidget {
           children: [
             _ProfileHeader(
               name: profile?.name ?? l10n.setUpProfile,
+              avatarPath: profile?.avatarPath,
               subtitle: profile == null
                   ? null
                   : [
@@ -326,10 +328,12 @@ class AppDrawer extends ConsumerWidget {
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     required this.name,
+    this.avatarPath,
     required this.subtitle,
     required this.onTap,
   });
   final String name;
+  final String? avatarPath;
   final String? subtitle;
   final VoidCallback onTap;
 
@@ -363,28 +367,12 @@ class _ProfileHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.25),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        width: 2,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      name.isEmpty
-                          ? '?'
-                          : name.characters.first.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 24,
-                      ),
-                    ),
+                  ProfileAvatar(
+                    name: name,
+                    avatarPath: avatarPath,
+                    radius: 28,
+                    backgroundColor: Colors.white.withValues(alpha: 0.25),
+                    borderColor: Colors.white.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 14),
                   Expanded(

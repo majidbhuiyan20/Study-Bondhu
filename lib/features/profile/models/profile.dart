@@ -87,6 +87,7 @@ class Profile {
   final String? institution; // e.g. "Dhaka College"
   final String? department; // e.g. "CSE"
   final String? studentId; // roll / registration number
+  final String? avatarPath; // local file path to profile photo
   final DateTime createdAt;
 
   const Profile({
@@ -97,6 +98,7 @@ class Profile {
     this.institution,
     this.department,
     this.studentId,
+    this.avatarPath,
     required this.createdAt,
   });
 
@@ -108,6 +110,7 @@ class Profile {
     String? institution,
     String? department,
     String? studentId,
+    String? avatarPath,
     DateTime? createdAt,
   }) =>
       Profile(
@@ -118,6 +121,7 @@ class Profile {
         institution: institution ?? this.institution,
         department: department ?? this.department,
         studentId: studentId ?? this.studentId,
+        avatarPath: avatarPath ?? this.avatarPath,
         createdAt: createdAt ?? this.createdAt,
       );
 
@@ -129,6 +133,7 @@ class Profile {
         'institution': institution,
         'department': department,
         'student_id': studentId,
+        'avatar_path': avatarPath,
         'created_at': createdAt.millisecondsSinceEpoch,
       };
 
@@ -143,6 +148,7 @@ class Profile {
         institution: m['institution'] as String?,
         department: m['department'] as String?,
         studentId: m['student_id'] as String?,
+        avatarPath: m['avatar_path'] as String?,
         createdAt:
             DateTime.fromMillisecondsSinceEpoch(m['created_at'] as int),
       );

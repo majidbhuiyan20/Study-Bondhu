@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/photo_picker_utils.dart';
+import '../../../core/widgets/profile_avatar.dart';
 import '../models/profile.dart';
 import '../view_models/profile_view_model.dart';
 
@@ -42,12 +44,24 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
       TextEditingController(text: widget.existing?.institution ?? '');
   late ProfileLevel _level = widget.existing?.level ?? ProfileLevel.school;
   late String? _classLabel = widget.existing?.classLabel;
+  late String? _avatarPath = widget.existing?.avatarPath;
 
   @override
   void dispose() {
     _name.dispose();
     _institution.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickPhoto(StateSetter setSt) async {
+    final path = await PhotoPickerUtils.showPhotoOptionsSheet(
+      context,
+      hasExistingPhoto: _avatarPath != null && _avatarPath!.isNotEmpty,
+    );
+    if (path == null) return;
+    setSt(() {
+      _avatarPath = path.isEmpty ? null : path;
+    });
   }
 
   @override
@@ -69,9 +83,32 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
                 widget.existing == null ? 'New profile' : 'Edit profile',
                 style: AppTextStyles.titleLarge,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
+              Center(
+                child: Column(
+                  children: [
+                    ProfileAvatar(
+                      name: _name.text.isEmpty ? 'Student' : _name.text,
+                      avatarPath: _avatarPath,
+                      radius: 40,
+                      showEditBadge: true,
+                      onTap: () => _pickPhoto(setSt),
+                    ),
+                    const SizedBox(height: 6),
+                    TextButton(
+                      onPressed: () => _pickPhoto(setSt),
+                      child: Text(
+                        _avatarPath == null ? 'Add photo' : 'Change photo',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
               TextField(
                 controller: _name,
+                onChanged: (_) => setSt(() {}),
                 decoration: const InputDecoration(
                   labelText: 'Profile name',
                   hintText: 'e.g. SSC 2026',
@@ -151,6 +188,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
                           institution: _institution.text.trim().isEmpty
                               ? null
                               : _institution.text.trim(),
+                          avatarPath: _avatarPath,
                           createdAt:
                               widget.existing?.createdAt ?? DateTime.now(),
                         );

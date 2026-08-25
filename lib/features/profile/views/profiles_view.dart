@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_empty_state.dart';
+import '../../../core/widgets/profile_avatar.dart';
 import '../models/profile.dart' show ProfileLevelX;
 import '../view_models/profile_view_model.dart';
 import '../widgets/edit_profile_sheet.dart';
@@ -69,15 +70,10 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                       },
                       child: Row(
                         children: [
-                          Container(
-                            width: 46,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.school_rounded,
-                                color: AppColors.primary),
+                          ProfileAvatar(
+                            name: p.name,
+                            avatarPath: p.avatarPath,
+                            radius: 23,
                           ),
                           const SizedBox(width: 12),
                           Expanded(

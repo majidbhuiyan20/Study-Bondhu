@@ -7,7 +7,9 @@ import '../../../core/l10n.dart' show AppLocalizationsBangla, AppLocalizationsCa
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_colors.dart';
+import '../../../core/utils/photo_picker_utils.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/profile_avatar.dart';
 import '../../assignments/view_models/assignments_view_model.dart';
 import '../../home/view_models/home_view_model.dart';
 import '../../home/widgets/quick_stats_row.dart';
@@ -142,18 +144,24 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   }
 }
 
-class _ProfileHeaderCard extends StatelessWidget {
+class _ProfileHeaderCard extends ConsumerWidget {
   const _ProfileHeaderCard({required this.profile});
   final Profile profile;
 
-  String get _initials {
-    final n = profile.name.trim();
-    if (n.isEmpty) return '?';
-    return n.characters.first.toUpperCase();
+  Future<void> _changePhoto(BuildContext context, WidgetRef ref) async {
+    final path = await PhotoPickerUtils.showPhotoOptionsSheet(
+      context,
+      hasExistingPhoto: profile.avatarPath != null && profile.avatarPath!.isNotEmpty,
+    );
+    if (path == null) return;
+    final updated = profile.copyWith(
+      avatarPath: path.isEmpty ? null : path,
+    );
+    await ref.read(profileViewModelProvider.notifier).updateProfile(updated);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
@@ -176,26 +184,14 @@ class _ProfileHeaderCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.25),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.6),
-                width: 2,
-              ),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              _initials,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 26,
-              ),
-            ),
+          ProfileAvatar(
+            name: profile.name,
+            avatarPath: profile.avatarPath,
+            radius: 32,
+            showEditBadge: true,
+            onTap: () => _changePhoto(context, ref),
+            backgroundColor: Colors.white.withValues(alpha: 0.25),
+            borderColor: Colors.white.withValues(alpha: 0.6),
           ),
           const SizedBox(width: 16),
           Expanded(

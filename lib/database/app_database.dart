@@ -56,6 +56,7 @@ class AppDatabase {
         ${Columns.profileInstitution} TEXT,
         ${Columns.profileDepartment} TEXT,
         ${Columns.profileStudentId} TEXT,
+        ${Columns.profileAvatar} TEXT,
         ${Columns.profileActive} INTEGER NOT NULL DEFAULT 0,
         ${Columns.createdAt} INTEGER NOT NULL
       )
@@ -543,6 +544,14 @@ class AppDatabase {
           'CREATE INDEX IF NOT EXISTS idx_revision_topic_date ON ${Tables.revisionItems}(${Columns.revisionTopicId}, ${Columns.revisionDate})');
       await db.execute(
           'CREATE INDEX IF NOT EXISTS idx_revision_status_date ON ${Tables.revisionItems}(${Columns.revisionStatus}, ${Columns.revisionDate})');
+    }
+    if (oldVersion < 9) {
+      // v8 → v9: add avatar_path to profiles for profile photo.
+      try {
+        await db.execute(
+          'ALTER TABLE ${Tables.profiles} ADD COLUMN ${Columns.profileAvatar} TEXT',
+        );
+      } catch (_) {/* already migrated */}
     }
   }
 }

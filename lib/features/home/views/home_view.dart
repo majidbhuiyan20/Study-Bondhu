@@ -13,6 +13,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_empty_state.dart';
 import '../../../core/widgets/quick_add_sheet.dart';
 import '../../assignments/view_models/assignments_view_model.dart';
+import '../../profile/view_models/profile_view_model.dart';
 import '../../settings/view_models/settings_view_model.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/greeting_header.dart';
@@ -48,6 +49,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final l10n = context.l10n;
     final state = ref.watch(homeViewModelProvider);
     final settings = ref.watch(settingsViewModelProvider);
+    final profile = ref.watch(profileViewModelProvider).active;
     final isBangla = l10n.isBangla;
 
     // Quick stats: derive weak topic count by checking each subject.
@@ -107,9 +109,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             children: [
               GreetingHeader(
-                name: settings.locale.languageCode == 'bn'
-                    ? 'বন্ধু'
-                    : 'Bondhu',
+                name: profile?.name.isNotEmpty == true
+                    ? profile!.name
+                    : (settings.locale.languageCode == 'bn'
+                        ? 'বন্ধু'
+                        : 'Bondhu'),
+                avatarPath: profile?.avatarPath,
+                onAvatarTap: () => context.push(AppRoutes.profile),
               ),
               const SizedBox(height: 18),
               QuickStatsRow(

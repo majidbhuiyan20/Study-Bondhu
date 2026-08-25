@@ -50,6 +50,7 @@ class Columns {
   static const String profileInstitution = 'institution';
   static const String profileDepartment = 'department';
   static const String profileStudentId = 'student_id';
+  static const String profileAvatar = 'avatar_path';
   static const String profileActive = 'is_active';
 
   // Subjects
