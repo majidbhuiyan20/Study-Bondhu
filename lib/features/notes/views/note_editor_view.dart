@@ -9,8 +9,9 @@ import '../models/note.dart';
 import '../view_models/notes_view_model.dart';
 
 class NoteEditorView extends ConsumerStatefulWidget {
-  const NoteEditorView({super.key, this.note});
+  const NoteEditorView({super.key, this.note, this.noteId});
   final Note? note;
+  final int? noteId;
 
   @override
   ConsumerState<NoteEditorView> createState() => _State();
@@ -22,13 +23,36 @@ class _State extends ConsumerState<NoteEditorView> {
   bool _saving = false;
   bool _preview = false;
   bool _pinned = false;
+  Note? _activeNote;
 
   @override
   void initState() {
     super.initState();
-    _title = TextEditingController(text: widget.note?.title ?? '');
-    _body = TextEditingController(text: widget.note?.body ?? '');
-    _pinned = widget.note?.isPinned ?? false;
+    _activeNote = widget.note;
+    _title = TextEditingController(text: _activeNote?.title ?? '');
+    _body = TextEditingController(text: _activeNote?.body ?? '');
+    _pinned = _activeNote?.isPinned ?? false;
+
+    if (_activeNote == null && widget.noteId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final notes = ref.read(notesViewModelProvider).notes;
+        Note? found;
+        for (final n in notes) {
+          if (n.id == widget.noteId) {
+            found = n;
+            break;
+          }
+        }
+        if (found != null && mounted) {
+          setState(() {
+            _activeNote = found;
+            _title.text = found!.title;
+            _body.text = found.body;
+            _pinned = found.isPinned;
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -42,7 +66,7 @@ class _State extends ConsumerState<NoteEditorView> {
     if (_title.text.trim().isEmpty) return;
     setState(() => _saving = true);
     final now = DateTime.now();
-    if (widget.note == null) {
+    if (_activeNote == null) {
       final id = await ref.read(notesViewModelProvider.notifier).addNote(
             Note(
               title: _title.text.trim(),
@@ -55,7 +79,7 @@ class _State extends ConsumerState<NoteEditorView> {
       if (mounted) Navigator.pop(context, id);
     } else {
       await ref.read(notesViewModelProvider.notifier).updateNote(
-            widget.note!.copyWith(
+            _activeNote!.copyWith(
               title: _title.text.trim(),
               body: _body.text,
               isPinned: _pinned,
@@ -67,10 +91,10 @@ class _State extends ConsumerState<NoteEditorView> {
   }
 
   Future<void> _delete() async {
-    if (widget.note?.id == null) return;
+    if (_activeNote?.id == null) return;
     await ref
         .read(notesViewModelProvider.notifier)
-        .deleteNote(widget.note!.id!);
+        .deleteNote(_activeNote!.id!);
     if (mounted) Navigator.pop(context);
   }
 

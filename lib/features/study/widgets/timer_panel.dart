@@ -7,6 +7,7 @@ import '../../../core/providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_colors.dart';
+import '../../../core/utils/date_utils.dart';
 import '../../../core/utils/duration_utils.dart';
 import '../../subjects/models/topic.dart';
 import '../../subjects/view_models/subjects_view_model.dart';
@@ -85,11 +86,11 @@ class _TimerPanelState extends ConsumerState<TimerPanel> {
       // Build the topic list for this subject (if any) so the user can
       // tag the session with a specific topic (spec 13).
       List<({int id, String name})> topics = const [];
-      final pickedSubjectId = _subjectId;
-      if (pickedSubjectId != null) {
+      final subjectId = session.subjectId;
+      if (subjectId != null) {
         final allTopics = await ref
             .read(subjectsRepositoryProvider)
-            .getTopics(pickedSubjectId);
+            .getTopics(subjectId);
         topics = allTopics
             .map((t) => (id: t.id!, name: t.name))
             .toList(growable: false);
@@ -195,7 +196,9 @@ class _TimerPanelState extends ConsumerState<TimerPanel> {
         _ => priorInterval.clamp(1, 30),
       };
     }
-    final next = DateTime.now().add(Duration(days: newInterval));
+    final next = AppDateUtils.morningOf(
+      DateTime.now().add(Duration(days: newInterval)),
+    );
     await ref.read(revisionRepositoryProvider).addRevision(
           RevisionItem(
             subjectId: session.subjectId,

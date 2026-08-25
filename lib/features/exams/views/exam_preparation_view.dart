@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/l10n.dart' show AppLocalizationsX,AppLocalizationsCamelCase;
+import '../../../core/l10n.dart' show AppLocalizationsX, AppLocalizationsBangla, AppLocalizationsCamelCase;
 import '../../../core/providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -14,6 +14,8 @@ import '../../subjects/models/subject.dart';
 import '../../subjects/models/syllabus_item.dart';
 import '../../subjects/models/topic.dart';
 import '../models/exam.dart';
+import '../view_models/exams_view_model.dart';
+import 'exam_add_view.dart';
 
 /// A single recommended task on the exam-prep page.
 /// The patient plan is sorted by urgency (weak topics first, then revision
@@ -221,7 +223,26 @@ class ExamPreparationView extends ConsumerWidget {
     final readinessAsync = ref.watch(examReadinessProvider(examId));
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.examPreparationTitle)),
+      appBar: AppBar(
+        title: Text(l10n.examPreparationTitle),
+        actions: [
+          if (examAsync.value != null)
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: l10n.edit,
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ExamAddView(existing: examAsync.value!),
+                  ),
+                );
+                ref.invalidate(_examProvider(examId));
+                ref.invalidate(examReadinessProvider(examId));
+                ref.read(examsViewModelProvider.notifier).load();
+              },
+            ),
+        ],
+      ),
       body: examAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -279,7 +300,8 @@ class _Body extends StatelessWidget {
     final daysLabel = switch (daysLeft) {
       0 => l10n.examToday,
       1 => l10n.examTomorrow,
-      _ => '${-daysLeft} ${l10n.examDaysLeft}',
+      < 0 => (l10n.isBangla ? 'পরীক্ষা শেষ হয়েছে' : 'Exam completed'),
+      _ => '$daysLeft ${l10n.examDaysLeft}',
     };
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/l10n.dart' show AppLocalizationsX,AppLocalizationsCamelCase;
+import '../../../core/l10n.dart' show AppLocalizationsX, AppLocalizationsBangla, AppLocalizationsCamelCase;
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_colors.dart';
 import '../../../core/widgets/app_button.dart';
@@ -10,7 +10,8 @@ import '../models/exam.dart';
 import '../view_models/exams_view_model.dart';
 
 class ExamAddView extends ConsumerStatefulWidget {
-  const ExamAddView({super.key});
+  const ExamAddView({super.key, this.existing});
+  final Exam? existing;
 
   @override
   ConsumerState<ExamAddView> createState() => _State();
@@ -27,6 +28,22 @@ class _State extends ConsumerState<ExamAddView> {
   ExamType _type = ExamType.midterm;
   int? _subjectId;
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existing != null) {
+      final e = widget.existing!;
+      _title.text = e.title;
+      _syllabus.text = e.syllabus ?? '';
+      _notes.text = e.notes ?? '';
+      _time.text = e.time ?? '';
+      _location.text = e.location ?? '';
+      _date = e.examDate;
+      _type = e.type;
+      _subjectId = e.subjectId;
+    }
+  }
 
   @override
   void dispose() {
@@ -51,27 +68,50 @@ class _State extends ConsumerState<ExamAddView> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
-    await ref.read(examsViewModelProvider.notifier).addExam(
-          Exam(
-            subjectId: _subjectId,
-            title: _title.text.trim(),
-            examDate: _date,
-            type: _type,
-            syllabus: _syllabus.text.trim().isEmpty
-                ? null
-                : _syllabus.text.trim(),
-            notes: _notes.text.trim().isEmpty
-                ? null
-                : _notes.text.trim(),
-            time: _time.text.trim().isEmpty
-                ? null
-                : _time.text.trim(),
-            location: _location.text.trim().isEmpty
-                ? null
-                : _location.text.trim(),
-            createdAt: DateTime.now(),
-          ),
-        );
+    if (widget.existing != null) {
+      await ref.read(examsViewModelProvider.notifier).updateExam(
+            widget.existing!.copyWith(
+              subjectId: _subjectId,
+              title: _title.text.trim(),
+              examDate: _date,
+              type: _type,
+              syllabus: _syllabus.text.trim().isEmpty
+                  ? null
+                  : _syllabus.text.trim(),
+              notes: _notes.text.trim().isEmpty
+                  ? null
+                  : _notes.text.trim(),
+              time: _time.text.trim().isEmpty
+                  ? null
+                  : _time.text.trim(),
+              location: _location.text.trim().isEmpty
+                  ? null
+                  : _location.text.trim(),
+            ),
+          );
+    } else {
+      await ref.read(examsViewModelProvider.notifier).addExam(
+            Exam(
+              subjectId: _subjectId,
+              title: _title.text.trim(),
+              examDate: _date,
+              type: _type,
+              syllabus: _syllabus.text.trim().isEmpty
+                  ? null
+                  : _syllabus.text.trim(),
+              notes: _notes.text.trim().isEmpty
+                  ? null
+                  : _notes.text.trim(),
+              time: _time.text.trim().isEmpty
+                  ? null
+                  : _time.text.trim(),
+              location: _location.text.trim().isEmpty
+                  ? null
+                  : _location.text.trim(),
+              createdAt: DateTime.now(),
+            ),
+          );
+    }
     if (mounted) Navigator.pop(context);
   }
 
@@ -80,7 +120,11 @@ class _State extends ConsumerState<ExamAddView> {
     final l10n = context.l10n;
     final subjectsAsync = ref.watch(_subjectsProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.examAddTitle)),
+      appBar: AppBar(
+        title: Text(widget.existing == null
+            ? l10n.examAddTitle
+            : (l10n.isBangla ? 'পরীক্ষা সম্পাদনা' : 'Edit Exam')),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -119,7 +163,7 @@ class _State extends ConsumerState<ExamAddView> {
               const SizedBox(height: 16),
               subjectsAsync.when(
                 data: (subjects) => DropdownButtonFormField<int?>(
-                  value: _subjectId,
+                  initialValue: _subjectId,
                   decoration:
                       const InputDecoration(hintText: 'Subject'),
                   items: [

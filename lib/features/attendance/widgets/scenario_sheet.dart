@@ -37,8 +37,8 @@ int maxAbsentsFor({
   required num target,
   required int present,
 }) {
-  if (totalClasses <= 0) return 0;
-  final raw = (totalClasses * target / 100).floor() - present;
+  if (totalClasses <= 0 || target <= 0) return 0;
+  final raw = (present * 100 / target).floor() - totalClasses;
   return raw < 0 ? 0 : raw;
 }
 

@@ -95,7 +95,7 @@ class SessionCompleteSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${DurationUtils.formatHms(session.duration)}',
+              DurationUtils.formatHms(session.duration),
               style: AppTextStyles.numericLarge,
             ),
             const SizedBox(height: 4),
@@ -137,7 +137,7 @@ class SessionCompleteSheet extends StatelessWidget {
               Text(l10n.topicPicker, style: AppTextStyles.titleSmall),
               const SizedBox(height: 8),
               DropdownButtonFormField<int?>(
-                value: topicId,
+                initialValue: topicId,
                 decoration: const InputDecoration(
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(

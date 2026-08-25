@@ -79,7 +79,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<ProfileLevel>(
-                value: _level,
+                initialValue: _level,
                 decoration:
                     const InputDecoration(labelText: 'Education level'),
                 items: ProfileLevel.values
@@ -102,7 +102,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _classLabel,
+                initialValue: _classLabel,
                 decoration:
                     const InputDecoration(labelText: 'Class / Year'),
                 items: [

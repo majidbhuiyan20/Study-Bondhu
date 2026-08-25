@@ -57,7 +57,7 @@ class _ExamsViewState extends ConsumerState<ExamsView> {
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: state.exams.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const SizedBox(height: 12),
                   itemBuilder: (_, i) => ExamCard(exam: state.exams[i]),
                 ),

@@ -11,7 +11,8 @@ import '../models/assignment.dart';
 import '../view_models/assignments_view_model.dart';
 
 class AssignmentAddView extends ConsumerStatefulWidget {
-  const AssignmentAddView({super.key});
+  const AssignmentAddView({super.key, this.existing});
+  final Assignment? existing;
 
   @override
   ConsumerState<AssignmentAddView> createState() => _State();
@@ -28,6 +29,22 @@ class _State extends ConsumerState<AssignmentAddView> {
   int? _subjectId;
   int? _topicId;
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existing != null) {
+      final a = widget.existing!;
+      _title.text = a.title;
+      _desc.text = a.description ?? '';
+      _estimate.text = a.estimatedMinutes?.toString() ?? '';
+      _due = a.dueDate;
+      _priority = a.priority;
+      _type = a.type;
+      _subjectId = a.subjectId;
+      _topicId = a.topicId;
+    }
+  }
 
   @override
   void dispose() {
@@ -52,21 +69,38 @@ class _State extends ConsumerState<AssignmentAddView> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     final estimateMin = int.tryParse(_estimate.text.trim());
-    await ref.read(assignmentsViewModelProvider.notifier).addAssignment(
-          Assignment(
-            subjectId: _subjectId,
-            topicId: _topicId,
-            title: _title.text.trim(),
-            description: _desc.text.trim().isEmpty
-                ? null
-                : _desc.text.trim(),
-            dueDate: _due,
-            priority: _priority,
-            type: _type,
-            estimatedMinutes: estimateMin,
-            createdAt: DateTime.now(),
-          ),
-        );
+    if (widget.existing != null) {
+      await ref.read(assignmentsViewModelProvider.notifier).updateAssignment(
+            widget.existing!.copyWith(
+              subjectId: _subjectId,
+              topicId: _topicId,
+              title: _title.text.trim(),
+              description: _desc.text.trim().isEmpty
+                  ? null
+                  : _desc.text.trim(),
+              dueDate: _due,
+              priority: _priority,
+              type: _type,
+              estimatedMinutes: estimateMin,
+            ),
+          );
+    } else {
+      await ref.read(assignmentsViewModelProvider.notifier).addAssignment(
+            Assignment(
+              subjectId: _subjectId,
+              topicId: _topicId,
+              title: _title.text.trim(),
+              description: _desc.text.trim().isEmpty
+                  ? null
+                  : _desc.text.trim(),
+              dueDate: _due,
+              priority: _priority,
+              type: _type,
+              estimatedMinutes: estimateMin,
+              createdAt: DateTime.now(),
+            ),
+          );
+    }
     if (mounted) Navigator.pop(context);
   }
 
@@ -78,7 +112,11 @@ class _State extends ConsumerState<AssignmentAddView> {
         ? const AsyncValue.data(<dynamic>[])
         : ref.watch(topicsForSubjectProvider(_subjectId!));
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.assignmentAddTitle)),
+      appBar: AppBar(
+        title: Text(widget.existing == null
+            ? l10n.assignmentAddTitle
+            : (l10n.isBangla ? 'অ্যাসাইনমেন্ট এডিট' : 'Edit Assignment')),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -127,7 +165,7 @@ class _State extends ConsumerState<AssignmentAddView> {
               const SizedBox(height: 6),
               subjectsAsync.when(
                 data: (subjects) => DropdownButtonFormField<int?>(
-                  value: _subjectId,
+                  initialValue: _subjectId,
                   decoration:
                       const InputDecoration(hintText: 'Select subject'),
                   items: [
@@ -148,7 +186,7 @@ class _State extends ConsumerState<AssignmentAddView> {
                 const SizedBox(height: 12),
                 topicsAsync.when(
                   data: (topics) => DropdownButtonFormField<int?>(
-                    value: _topicId,
+                    initialValue: _topicId,
                     decoration:
                         const InputDecoration(hintText: 'Select topic'),
                     items: [

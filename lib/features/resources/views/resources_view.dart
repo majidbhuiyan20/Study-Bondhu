@@ -59,7 +59,7 @@ class _State extends ConsumerState<ResourcesView> {
                 children: [
                   if (widget.subjectId == null)
                     DropdownButtonFormField<int>(
-                      value: subjectId,
+                      initialValue: subjectId,
                       decoration: InputDecoration(
                           labelText: isBn ? 'বিষয়' : 'Subject'),
                       items: subjects

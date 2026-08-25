@@ -12,6 +12,7 @@ import '../features/expenses/views/expense_add_view.dart';
 import '../features/expenses/views/expenses_view.dart';
 import '../features/expenses/views/income_add_view.dart';
 import '../features/home/views/main_shell.dart';
+import '../features/notes/views/note_editor_view.dart';
 import '../features/notes/views/notes_view.dart';
 import '../features/profile/views/onboarding_view.dart';
 import '../features/profile/views/profile_view.dart';
@@ -132,6 +133,10 @@ GoRouter buildRouter() {
         },
       ),
       GoRoute(
+        path: AppRoutes.studyTimer,
+        builder: (context, state) => const StudyView(),
+      ),
+      GoRoute(
         path: AppRoutes.studyLog,
         builder: (context, state) => const StudyLogView(),
       ),
@@ -142,6 +147,17 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.notes,
         builder: (context, state) => const NotesView(),
+      ),
+      GoRoute(
+        path: AppRoutes.noteEditor,
+        builder: (context, state) => const NoteEditorView(),
+      ),
+      GoRoute(
+        path: AppRoutes.noteDetail,
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          return NoteEditorView(noteId: id);
+        },
       ),
       GoRoute(
         path: AppRoutes.expenses,

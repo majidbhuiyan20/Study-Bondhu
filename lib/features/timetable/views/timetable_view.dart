@@ -390,7 +390,7 @@ class _SlotSheetState extends ConsumerState<_SlotSheet> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
-            value: _subjectId,
+            initialValue: _subjectId,
             decoration: InputDecoration(
               labelText: isBn ? 'বিষয়' : 'Subject',
             ),

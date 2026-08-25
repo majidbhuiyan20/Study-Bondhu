@@ -458,7 +458,7 @@ class _AddRevisionSheetState extends ConsumerState<_AddRevisionSheet> {
           const SizedBox(height: 16),
           subjectsAsync.when(
             data: (subs) => DropdownButtonFormField<int?>(
-              value: _subjectId,
+              initialValue: _subjectId,
               decoration:
                   InputDecoration(hintText: l10n.subject),
               items: [

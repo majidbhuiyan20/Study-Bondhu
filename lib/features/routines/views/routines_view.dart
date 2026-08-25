@@ -82,7 +82,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: routines.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (_, i) {
         final r = routines[i];
         return _routineCard(context, r, today: today);
@@ -101,7 +101,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: state.routines.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (_, i) {
         final r = state.routines[i];
         return _routineCard(context, r);
@@ -290,7 +290,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> {
                     builder: (_, snap) {
                       final subjects = snap.data ?? const [];
                       return DropdownButtonFormField<int?>(
-                        value: subjectId,
+                        initialValue: subjectId,
                         decoration: const InputDecoration(
                             labelText: 'Subject (optional)'),
                         items: [

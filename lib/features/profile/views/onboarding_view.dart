@@ -425,7 +425,7 @@ class _ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<ProfileLevel>(
-            value: level,
+            initialValue: level,
             decoration: InputDecoration(
               labelText: l10n.isBangla ? 'শিক্ষার স্তর' : 'Education level',
             ),
@@ -441,7 +441,7 @@ class _ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: classLabel,
+            initialValue: classLabel,
             decoration: InputDecoration(
               labelText:
                   '${l10n.isBangla ? 'ক্লাস/বর্ষ' : 'Class / year'} *',

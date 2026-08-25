@@ -387,10 +387,32 @@ class HomeViewModel extends StateNotifier<HomeState> {
     required List<RevisionItem> pendingRevisions,
     required List<Topic> weakTopics,
   }) {
+    return computeRecommendation(
+      subjects: subjects,
+      upcomingExams: upcomingExams,
+      subjectSeconds: subjectSeconds,
+      pendingRevisions: pendingRevisions,
+      weakTopics: weakTopics,
+    );
+  }
+
+  /// Pure recommendation algorithm exposed for unit tests.
+  static StudyRecommendation? computeRecommendation({
+    required List<Subject> subjects,
+    required List<Exam> upcomingExams,
+    required Map<int, int> subjectSeconds,
+    required List<RevisionItem> pendingRevisions,
+    required List<Topic> weakTopics,
+  }) {
     if (subjects.isEmpty) return null;
     // Priority 1: closest exam within 14 days.
-    if (upcomingExams.isNotEmpty) {
-      final ex = upcomingExams.first;
+    final nearExams = upcomingExams.where((e) {
+      final days = du.AppDateUtils.daysUntil(e.examDate);
+      return days <= 14;
+    }).toList();
+
+    if (nearExams.isNotEmpty) {
+      final ex = nearExams.first;
       final subj = subjects.firstWhere(
         (s) => s.id == ex.subjectId,
         orElse: () => subjects.first,

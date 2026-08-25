@@ -16,6 +16,7 @@ import '../models/assignment.dart';
 import '../view_models/assignments_view_model.dart';
 import '../widgets/assignment_card.dart';
 import '../widgets/assignment_subtasks_sheet.dart';
+import 'assignment_add_view.dart';
 
 class AssignmentsView extends ConsumerStatefulWidget {
   const AssignmentsView({super.key});
@@ -178,8 +179,15 @@ class _Body extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.edit_outlined),
               title: const Text('Edit'),
-              enabled: false,
-              subtitle: const Text('Open the add form again to edit'),
+              subtitle: const Text('Edit title, priority, due date or details'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AssignmentAddView(existing: a),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline,

@@ -42,6 +42,11 @@ class AssignmentsViewModel extends StateNotifier<AssignmentsState> {
     await load();
   }
 
+  Future<void> updateAssignment(Assignment a) async {
+    await _ref.read(assignmentsRepositoryProvider).updateAssignment(a);
+    await load();
+  }
+
   Future<void> toggleComplete(Assignment a) async {
     await _ref.read(assignmentsRepositoryProvider).toggleComplete(a);
     await load();

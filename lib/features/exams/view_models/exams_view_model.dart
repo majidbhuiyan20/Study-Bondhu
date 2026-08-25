@@ -32,6 +32,11 @@ class ExamsViewModel extends StateNotifier<ExamsState> {
     await load();
   }
 
+  Future<void> updateExam(Exam e) async {
+    await _ref.read(examsRepositoryProvider).updateExam(e);
+    await load();
+  }
+
   Future<void> deleteExam(int id) async {
     await _ref.read(examsRepositoryProvider).deleteExam(id);
     await load();

@@ -56,7 +56,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: state.profiles.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) {
                     final p = state.profiles[i];
                     final isActive = state.active?.id == p.id;

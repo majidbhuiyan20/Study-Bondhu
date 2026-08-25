@@ -102,7 +102,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get background_resume => 'আবার শুরু নাকি শেষ?';
 
   @override
-  String get backup => 'ব্যাকআপ';
+  String get backup => 'ব্যাকআপ ও পুনরুদ্ধার';
 
   @override
   String get bangla => 'বাংলা';
@@ -262,7 +262,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get drawer_goals => 'লক্ষ্যসমূহ';
 
   @override
-  String get drawer_logout => 'লগ আউট';
+  String get drawer_logout => 'সাইন আউট';
 
   @override
   String get drawer_menu => 'মেনু';
@@ -345,7 +345,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get exam_prep_title => 'পরীক্ষার প্রস্তুতি';
 
   @override
-  String get exam_time => 'সময় (যেমন ০৯:০০ – ১১:০০)';
+  String get exam_time => 'সময় (যেমন: ০৯:০০ – ১১:০০)';
 
   @override
   String get exam_today => 'আজ';
@@ -360,7 +360,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get exams_hint => 'পরীক্ষা যোগ করুন';
 
   @override
-  String get expense_amount => 'পরি�াণ';
+  String get expense_amount => 'পরিমাণ';
 
   @override
   String get expense_category => 'বিভাগ';
@@ -405,7 +405,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get goal_daily => 'দৈনিক';
 
   @override
-  String get goal_progress => '�গ্রগতি';
+  String get goal_progress => 'অগ্রগতি';
 
   @override
   String get goal_reached_today => 'আজকের লক্ষ্য পূরণ! দারুণ!';
@@ -577,7 +577,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get no_weak_topics => 'কোনো দুর্বল টপিক নেই';
 
   @override
-  String get note_body => 'নোট লে�ো…';
+  String get note_body => 'নোট লেখো…';
 
   @override
   String get note_search => 'নোট খুঁজুন';
@@ -625,7 +625,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get ok => 'ঠিক আছে';
 
   @override
-  String get onboarding_continue => 'পরবর্তী';
+  String get onboarding_continue => 'চালিয়ে যান';
 
   @override
   String get onboarding_get_started => 'শুরু করুন';
@@ -637,7 +637,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get onboarding_step_done => 'সব প্রস্তুত!';
 
   @override
-  String get onboarding_step_goal => 'দ�নিক লক্ষ্য নির্ধারণ করুন';
+  String get onboarding_step_goal => 'দৈনিক লক্ষ্য নির্ধারণ করুন';
 
   @override
   String get onboarding_step_profile => 'নিজের সম্পর্কে বলুন';
@@ -653,7 +653,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get onboarding_welcome_body =>
-      'আপনার অফলাইন পড়ার স�্গী — বাংলাদেশি শিক্ষার্থীদের জন্য তৈরি।';
+      'আপনার অফলাইন পড়ার সঙ্গী — বাংলাদেশি শিক্ষার্থীদের জন্য তৈরি।';
 
   @override
   String get pause => 'বিরতি';
@@ -692,7 +692,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get priority_medium => 'মাঝারি';
 
   @override
-  String get profile_chip => 'প্রো�াইল';
+  String get profile_chip => 'প্রোফাইল';
 
   @override
   String get profiles => 'প্রোফাইলসমূহ';
@@ -707,7 +707,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get qa_expense => 'খরচ';
 
   @override
-  String get qa_flashcard => 'ড্যাশবোর্ড';
+  String get qa_flashcard => 'ফ্ল্যাশকার্ড';
 
   @override
   String get qa_note => 'নোট';
@@ -1000,7 +1000,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get target_attendance => 'লক্ষ্য উপস্থিতি';
 
   @override
-  String get target_min => 'লক্ষ্য (মিনি�)';
+  String get target_min => 'লক্ষ্য (মিনিট)';
 
   @override
   String get target_percent => 'লক্ষ্য';
@@ -1024,7 +1024,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get todays_study => 'আজকের পড়াশোনা';
 
   @override
-  String get topic_picker => 'টপিক (�চ্ছিক)';
+  String get topic_picker => 'টপিক (ঐচ্ছিক)';
 
   @override
   String get topic_status_label => 'অবস্থা';
@@ -1126,7 +1126,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get quick_add_subject => 'দ্রুত বিষয় যোগ';
 
   @override
-  String get quick_add_task => 'দ্রুত অ্যাসাইনমেন্ট যোগ';
+  String get quick_add_task => 'দ্রুত কাজ যোগ';
 
   @override
   String get quick_add_topic => 'দ্রুত টপিক যোগ';

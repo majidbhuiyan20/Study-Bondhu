@@ -75,78 +75,58 @@ class SettingsView extends ConsumerWidget {
           _Section(title: l10n.language),
           const SizedBox(height: 8),
           AppCard(
-            child: Column(
-              children: [
-                RadioListTile<String>(
-                  value: AppConstants.localeEn,
-                  groupValue: state.locale.languageCode,
-                  onChanged: (v) async {
-                    if (v != null) {
-                      await ref
-                          .read(settingsViewModelProvider.notifier)
-                          .setLocale(Locale(v));
-                    }
-                  },
-                  title: const Text('English'),
-                ),
-                RadioListTile<String>(
-                  value: AppConstants.localeBn,
-                  groupValue: state.locale.languageCode,
-                  onChanged: (v) async {
-                    if (v != null) {
-                      await ref
-                          .read(settingsViewModelProvider.notifier)
-                          .setLocale(Locale(v));
-                    }
-                  },
-                  title: const Text('বাংলা'),
-                ),
-              ],
+            child: RadioGroup<String>(
+              groupValue: state.locale.languageCode,
+              onChanged: (v) async {
+                if (v != null) {
+                  await ref
+                      .read(settingsViewModelProvider.notifier)
+                      .setLocale(Locale(v));
+                }
+              },
+              child: Column(
+                children: [
+                  RadioListTile<String>(
+                    value: AppConstants.localeEn,
+                    title: const Text('English'),
+                  ),
+                  RadioListTile<String>(
+                    value: AppConstants.localeBn,
+                    title: const Text('বাংলা'),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
           _Section(title: l10n.theme),
           const SizedBox(height: 8),
           AppCard(
-            child: Column(
-              children: [
-                RadioListTile<ThemeMode>(
-                  value: ThemeMode.system,
-                  groupValue: state.themeMode,
-                  onChanged: (v) async {
-                    if (v != null) {
-                      await ref
-                          .read(settingsViewModelProvider.notifier)
-                          .setThemeMode(v);
-                    }
-                  },
-                  title: Text(l10n.systemMode),
-                ),
-                RadioListTile<ThemeMode>(
-                  value: ThemeMode.light,
-                  groupValue: state.themeMode,
-                  onChanged: (v) async {
-                    if (v != null) {
-                      await ref
-                          .read(settingsViewModelProvider.notifier)
-                          .setThemeMode(v);
-                    }
-                  },
-                  title: Text(l10n.lightMode),
-                ),
-                RadioListTile<ThemeMode>(
-                  value: ThemeMode.dark,
-                  groupValue: state.themeMode,
-                  onChanged: (v) async {
-                    if (v != null) {
-                      await ref
-                          .read(settingsViewModelProvider.notifier)
-                          .setThemeMode(v);
-                    }
-                  },
-                  title: Text(l10n.darkMode),
-                ),
-              ],
+            child: RadioGroup<ThemeMode>(
+              groupValue: state.themeMode,
+              onChanged: (v) async {
+                if (v != null) {
+                  await ref
+                      .read(settingsViewModelProvider.notifier)
+                      .setThemeMode(v);
+                }
+              },
+              child: Column(
+                children: [
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.system,
+                    title: Text(l10n.systemMode),
+                  ),
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.light,
+                    title: Text(l10n.lightMode),
+                  ),
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.dark,
+                    title: Text(l10n.darkMode),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
